@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" name="viewport" content="with=device-width, initial-scale=1.0" />
+    <title>City Photos</title>
+    <link rel="stylesheet" href="../css/city.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+</head>
+<body>
+    
+        <nav id="navbar">
+            <input type="checkbox" id="check">
+            <label for="check" class="checkbtn">
+                <i class="fa fa-bars"></i>
+            </label>
+            <a class="logo" href="../index.html">PHOTOGRAPHY</a>
+            <ul>
+                <li>
+                    <a id="link1" class="fa fa-instagram" style="font-size:30px; color: white;" href="https://www.instagram.com/pavel_krucek/"
+                       target="_blank"></a>
+                </li>
+                <li>
+                    <a id="link2" class="fa fa-facebook-square" style="font-size:30px; color: white;" href="https://www.facebook.com/Czechdrummerboy/"
+                       target="_blank"></a>
+                </li>
+                <li>
+                    <a id="link3" class="fa fa-money" style="font-size: 30px; color: white;" href="https://pavel-krucek.picfair.com"
+                       target="_blank"></a>
+                </li>
+                <li><a id="link4" class="fa fa-paper-plane" style="font-size: 30px; color: white;" href="../html/contact.html"></a></li>
+                <li><a id="link5" class="about-me" href="html/about_me.html" target="_parent">ABOUT ME </a></li>
+            </ul>
+        </nav><br />
+
+    <section class="mrizka">
+        <div class="row">
+            <div class="column">
+                <a href="../gallery/large/DSC_2927.jpg"><img src="../gallery/small/DSC_2927.jpg" /></a>
+                <a href="../gallery/large/DSC_2929.jpg"><img src="../gallery/small/DSC_2929.jpg" /></a>
+                <a href="../gallery/large/DSC_2930.jpg"><img src="../gallery/small/DSC_2930.jpg" /></a>
+                <a href="../gallery/large/DSC_2938.jpg"><img src="../gallery/small/DSC_2938.jpg" /></a>
+                <a href="../gallery/large/DSC_2956.jpg"><img src="../gallery/small/DSC_2956.jpg" /></a>
+            </div>
+
+            <div class="column">
+                <a href="../gallery/large/DSC_2927.jpg"><img src="../gallery/small/DSC_2927.jpg" /></a>
+                <a href="../gallery/large/DSC_2929.jpg"><img src="../gallery/small/DSC_2929.jpg" /></a>
+                <a href="../gallery/large/DSC_2930.jpg"><img src="../gallery/small/DSC_2930.jpg" /></a>
+                <a href="../gallery/large/DSC_2938.jpg"><img src="../gallery/small/DSC_2938.jpg" /></a>
+                <a href="../gallery/large/DSC_2956.jpg"><img src="../gallery/small/DSC_2956.jpg" /></a>
+            </div>
+
+            <div class="column">
+                <a href="../gallery/large/DSC_2927.jpg"><img src="../gallery/small/DSC_2927.jpg" /></a>
+                <a href="../gallery/large/DSC_2929.jpg"><img src="../gallery/small/DSC_2929.jpg" /></a>
+                <a href="../gallery/large/DSC_2930.jpg"><img src="../gallery/small/DSC_2930.jpg" /></a>
+                <a href="../gallery/large/DSC_2938.jpg"><img src="../gallery/small/DSC_2938.jpg" /></a>
+                <a href="../gallery/large/DSC_2956.jpg"><img src="../gallery/small/DSC_2956.jpg" /></a>
+            </div>
+
+            <div class="column">
+                <a href="../html/fotky/ohnostroj1.html"><img src="../gallery/small/DSC_2927.jpg" /></a>
+                <a href="../gallery/large/DSC_2929.jpg"><img src="../gallery/small/DSC_2929.jpg" /></a>
+                <a href="../gallery/large/DSC_2930.jpg"><img src="../gallery/small/DSC_2930.jpg" /></a>
+                <a href="../gallery/large/DSC_2938.jpg"><img src="../gallery/small/DSC_2938.jpg" /></a>
+                <a href="../gallery/large/DSC_2956.jpg"><img src="../gallery/small/DSC_2956.jpg" /></a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="text-align:center; color: white;">©
+        <script>document.write(new Date().getFullYear());</script></p>
+    </footer>
+
+    <script>
+        var lastScrollTop; // This Varibale will store the top position
+
+        navbar = document.getElementById('navbar'); // Get The NavBar
+
+        window.addEventListener('scroll', function () {
+            //on every scroll this funtion will be called
+
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            //This line will get the location on scroll
+
+            if (scrollTop > lastScrollTop) { //if it will be greater than the previous
+                navbar.style.top = '-80px';
+                //set the value to the negetive of height of navbar 
+            }
+
+            else {
+                navbar.style.top = '0';
+            }
+
+            lastScrollTop = scrollTop; //New Position Stored
+        });
+    </script>
+
+</body>
+</html>
