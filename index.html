@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" name="viewport" content="with=device-width, initial-scale=1.0" />
+    <title>Pavel Krůček</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+</head>
+<body>
+
+    <section class="navig">
+        <nav>
+            <input type="checkbox" id="check">
+            <label for="check" class="checkbtn">
+                <i class="fa fa-bars">X</i>
+            </label>
+            <label class="logo">PHOTOGRAPHY</label>
+            <ul>
+                <li><a id="link1" class="fa fa-instagram" style="font-size:30px; color: white;" href="https://www.instagram.com/pavel_krucek/"
+                       target="_blank"></a></li>
+                <li><a id="link2" class="fa fa-facebook-square" style="font-size:30px; color: white;" href="https://www.facebook.com/Czechdrummerboy/"
+                       target="_blank"></a></li>
+                <li><a id="link3" class="fa fa-money" style="font-size: 30px; color: white;" href="https://pavel-krucek.picfair.com"
+                       target="_blank"></a></li>
+                <li><a id="link4" class="fa fa-paper-plane" style="font-size: 30px; color: white;" href="html/contact.html"></a></li>
+                <li><a id="link5" class="about-me" href="html/about_me.html" target="_parent">ABOUT ME </a></li>
+            </ul>
+        </nav>
+    </section>
+
+    <section class="gallery">
+        <div class="row">
+            <div class="column">
+                <img src="pictures/city.jpg" />
+                <a href="html/city.html">
+                    <div class="layer" href="html/city.html">
+                        <h3>CITY</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="column">
+                <img src="pictures/astro.jpg" />
+                <a href="html/astro.html">
+                    <div class="layer">
+                        <h3>ASTRO</h3>
+                    </div>
+                </a>
+            </div>
+            <div class="column">
+                <img src="pictures/nature.jpg" />
+                <a href="html/nature.html">
+                    <div class="layer">
+                        <h3>NATURE</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="year">
+        <a style="text-align:center; color:white;">
+            ©
+            <script>document.write(new Date().getFullYear());</script>
+        </a>
+    </section>
+
+    <script>
+        var menu_btn = document.getElementById("check");
+
+        var link1 = document.getElementById("link1");
+        var link2 = document.getElementById("link2");
+        var link3 = document.getElementById("link3");
+        var link4 = document.getElementById("link4");
+        var link5 = document.getElementById("link5");
+
+        link1.addEventListener("click", function () {
+            menu_btn.checked = false;
+        });
+        link2.addEventListener("click", function () {
+            menu_btn.checked = false;
+        });
+        link3.addEventListener("click", function () {
+            menu_btn.checked = false;
+        });
+        link4.addEventListener("click", function () {
+            menu_btn.checked = false;
+        });
+        link5.addEventListener("click", function () {
+            menu_btn.checked = false;
+        });
+
+    </script>
+
+</body>
+</html>
