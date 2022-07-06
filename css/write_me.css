@@ -44,7 +44,7 @@ body {
     }
 
 #logo_text {
-    font-family: 'Trebuchet MS';
+    font-family: 'Trebuchet MS', sans-serif;
 }
 
 .logo a {
