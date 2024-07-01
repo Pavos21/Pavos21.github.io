@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form to Google Sheets</title>
+    <style>
+        /* Add your CSS here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Submit Data to Google Sheets</h1>
+    <form id="data-form">
+        <input type="text" id="name" name="name" placeholder="Your Name" required>
+        <input type="email" id="email" name="email" placeholder="Your Email" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('data-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+
+            var data = {
+                name: name,
+                email: email
+            };
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://script.google.com/macros/s/AKfycbzYtZcGe6cVMmHBN6Dy2vGdL6YvkXbiuK2izmU3oGbKz9oQHnRq8_0gnC9Qjr9ETdxZ/exec');    //https://docs.google.com/spreadsheets/d/1cmV3WRBU4R3gEpm1ax_J4Sx8krHVhFpsw9qTfJqfSrg
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    alert('Data submitted successfully');
+                }
+            };
+        });
+    </script>
+</body>
+</html>
