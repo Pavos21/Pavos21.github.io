@@ -1,34 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form to Google Sheets</title>
-    <style>
-        
-    </style>
+    <title>Tipsport Tipovačka</title>
 </head>
 <body>
-    <div class="container">
-        <form method="post" action="" name="contact-form">
-            <h4>Contact</h4>
-            <input type="text" name="your-name" placeholder="Name">
-            <input type="text" name="your-number" placeholder="Number">
-            <input type="submit" value="Submit" id="submit">
-        </form>
-    </div>
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyqnGQaFN318g3sUoD_u-VqvLn1FFoV9-oIJL5XWvRUyiobKf0WImgcR-uihKnCaL-4hA/exec'
+    <h1>Wimbledon 2024</h1>
 
-        const form = document.forms['contact-form']
+    <h3 id="deadline" class="deadline"></h3>
 
-        form.addEventListener('submit', e => {
-            e.preventDefault()
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-            .then(response => alert("Thank You!"))
-            .then(() => { window.location.reload(); })
-            .catch(error => console.error('Error!', error.message))
-        })
+    <!-- Form to submit user data -->
+    <form id="dataForm">
+        <label for="name">Tipsport/Chance nick:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+        <div id="dynamicInputFields"></div>
+        <input type="submit" value="Submit">
+    </form>
+
+    <script type="module">
+        // Your existing Firebase and form submission code...
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, doc, getDoc, updateDoc, arrayUnion, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
+            authDomain: "tipsport-tipovacka.firebaseapp.com",
+            projectId: "tipsport-tipovacka",
+            storageBucket: "tipsport-tipovacka.appspot.com",
+            messagingSenderId: "198960405925",
+            appId: "1:198960405925:web:b159a12d4177da420f5c4c",
+            measurementId: "G-WD5R3BFV3K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        function getCurrentDate() {
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000); // Convert Firestore Timestamp to JavaScript Date
+            return date.toLocaleString(); // Format date as localized string
+        }
+
+        document.getElementById('dataForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const currentDate = getCurrentDate();
+            const tips = Array.from(document.querySelectorAll('.tip')).map(input => input.value);
+
+            try {
+                const userDocRef = doc(db, currentDate, name);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    alert("❗Tento uživatel má už dnes natipováno❗\n Nelze tipovat 2x ani měnit tipy");
+                } else {
+                    await setDoc(userDocRef, {
+                        tips: tips
+                    });
+                    console.log("Document written with ID: ", name);
+                    alert("Úspěšně odesláno ✅");
+                }
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Error submitting data.");
+            }
+        });
+
+        // Function to populate match data from Firestore and create dynamic input fields
+        async function populateMatchData() {
+            const dynamicInputFieldsDiv = document.getElementById('dynamicInputFields');
+            dynamicInputFieldsDiv.innerHTML = '';
+
+            try {
+                const currentDate = getCurrentDate();
+                const zapasyDocRef = doc(db, currentDate, 'zapasy');
+                const zapasyDocSnap = await getDoc(zapasyDocRef);
+
+                if (zapasyDocSnap.exists()) {
+                    const data = zapasyDocSnap.data();
+                    const tips = data.tips;
+                    const matches = data.matches;
+                    const timestamp = data.time;
+
+                    // Check if 'timestamp' is a Firestore Timestamp object
+                    if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+                        const deadlineElement = document.getElementById('deadline');
+                        deadlineElement.textContent = `Deadline: ${formatTimestamp(timestamp)}`;
+                    } else {
+                        console.error("Timestamp field is not a valid Firestore Timestamp object.");
+                    }
+
+                    if (tips && matches && tips.length === matches.length) {
+                        for (let i = 0; i < tips.length; i++) {
+                            // Create dynamic input fields
+                            const tipLabel = document.createElement('label');
+                            tipLabel.textContent = `Zápas: ${matches[i]}`;
+
+                            // Create a line break
+                            const lineBreak = document.createElement('br');
+
+                            // Create second line text node
+                            const tipText = document.createTextNode(`Tipovat: ${tips[i]}`);
+
+                            // Create input element
+                            const tipInput = document.createElement('input');
+                            tipInput.type = 'text';
+                            tipInput.classList.add('tip');
+                            tipInput.name = `tip${i}`;
+                            tipInput.required = true;
+
+                            // Append elements to dynamicInputFieldsDiv
+                            dynamicInputFieldsDiv.appendChild(tipLabel);
+                            dynamicInputFieldsDiv.appendChild(lineBreak);
+                            dynamicInputFieldsDiv.appendChild(tipText);
+                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                            dynamicInputFieldsDiv.appendChild(tipInput);
+                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                        }
+                        
+                    } else {
+                        console.error("Tips and matches arrays are not of the same length.");
+                    }
+                } else {
+                    console.log("No such document with ID 'zapasy'!");
+                }
+            } catch (error) {
+                console.error("Error getting document: ", error);
+            }
+        }
+
+        // Call function to populate match data on page load
+        document.addEventListener('DOMContentLoaded', populateMatchData);
     </script>
 </body>
 </html>
