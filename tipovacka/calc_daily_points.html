@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Results Tips</title>
+    <!-- Firebase JavaScript SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, collection, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
+            authDomain: "tipsport-tipovacka.firebaseapp.com",
+            projectId: "tipsport-tipovacka",
+            storageBucket: "tipsport-tipovacka.appspot.com",
+            messagingSenderId: "198960405925",
+            appId: "1:198960405925:web:b159a12d4177da420f5c4c",
+            measurementId: "G-WD5R3BFV3K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        document.getElementById('dateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const selectedDate = document.getElementById('datepicker').value;
+            const formattedDate = formatDate(selectedDate);
+            const newUrl = `calc_daily_points.html?date=${formattedDate}`;
+            window.location.href = newUrl;
+        });
+
+        function formatDate(date) {
+            const [yyyy, mm, dd] = date.split('-');
+            return `${dd}.${mm}.${yyyy}`;
+        }
+
+        function getDateFromUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateString = urlParams.get('date');
+            return dateString;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlDate = getDateFromUrlParams();
+            if (urlDate) {
+                await fetchAndCompareTips(urlDate);
+            } else {
+                console.error('No date parameter found in URL');
+
+                // Set today's date as default in the date picker
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('datepicker').value = today;
+            }
+        });
+
+        // Function to fetch and display "results" tips array
+        async function fetchAndCompareTips(date) {
+            try {
+                const usersRef = collection(db, date);
+                const snapshot = await getDocs(usersRef);
+
+                let resultsTips = [];
+                const resultsList = [];
+
+                // First, fetch and store "results" tips
+                snapshot.forEach(doc => {
+                    if (doc.id.toLowerCase() === 'results') {
+                        resultsTips = doc.data().tips;
+                    }else if (doc.id.toLowerCase() === 'zapasy'){
+                        return;
+                    } else {
+                        const username = doc.id;
+                        const tips = doc.data().tips;
+                        resultsList.push({ name: username, tips: tips });
+                    }
+                });
+
+                displayResultsInTable(resultsList, resultsTips);
+
+            } catch (error) {
+                console.error("Error fetching results data:", error);
+                alert("Error fetching data. Please try again later.");
+            }
+        }
+
+        function displayResultsInTable(resultsList, resultsTips) {
+            const tableBody = document.getElementById('resultsTableBody');
+            tableBody.innerHTML = ''; // Clear existing table rows
+
+            resultsList.forEach(result => {
+                const row = document.createElement('tr');
+
+                const nameCell = document.createElement('td');
+                nameCell.textContent = result.name;
+                row.appendChild(nameCell);
+
+                const tipsCell = document.createElement('td');
+                tipsCell.textContent = result.tips.join(', '); // Join tips array with a comma
+                row.appendChild(tipsCell);
+
+                const comparisonCell = document.createElement('td');
+                const comparisonResults = compareTips(result.tips, resultsTips);
+                comparisonCell.textContent = comparisonResults.join(', '); // Display comparison results as a string
+                row.appendChild(comparisonCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function compareTips(userTips, resultsTips) {
+            const comparisonResults = [];
+            // Ensure both arrays have the same length
+            const maxLength = Math.max(userTips.length, resultsTips.length);
+            for (let i = 0; i < maxLength; i++) {
+                if (userTips[i] && resultsTips[i] && userTips[i].trim().toLowerCase() === resultsTips[i].trim().toLowerCase()) {
+                    comparisonResults.push(true);
+                } else {
+                    comparisonResults.push(false);
+                }
+            }
+            return comparisonResults;
+        }
+    </script>
+</head>
+<body>
+    <h1>Results Tips</h1>
+    <form id="dateForm">
+        <label for="date">Select Date:</label>
+        <input type="date" id="datepicker" name="date" required>
+        <button type="submit">Fetch Tips</button>
+    </form>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Tips</th>
+                <th>Comparison Result</th>
+            </tr>
+        </thead>
+        <tbody id="resultsTableBody">
+            <!-- Table rows will be added here -->
+        </tbody>
+    </table>
+</body>
+</html>

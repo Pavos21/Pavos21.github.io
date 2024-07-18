@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insert Data to Firestore</title>
+    <script type="module">
+        // Import Firebase libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, collection, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
+            authDomain: "tipsport-tipovacka.firebaseapp.com",
+            projectId: "tipsport-tipovacka",
+            storageBucket: "tipsport-tipovacka.appspot.com",
+            messagingSenderId: "198960405925",
+            appId: "1:198960405925:web:b159a12d4177da420f5c4c",
+            measurementId: "G-WD5R3BFV3K"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Helper function to parse date string to Firestore Timestamp
+
+        function parseTimeStringToTimestamp(dateString) {
+            const [year, month, day] = dateString.split('-');
+            const formattedDate = `${day}.${month}.${year}`;
+            return formattedDate;
+        }
+
+        function parseDateStringToTimestamp(dateString) {
+            const date = new Date(dateString);
+            return Timestamp.fromDate(date);
+        }
+
+        // Form submission handler
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('dataForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const dateString = document.getElementById('date').value;
+                const date = parseTimeStringToTimestamp(dateString);
+                const matches = document.getElementById('matches').value.split(',');
+                const tips = document.getElementById('tips').value.split(',');
+                const timestampString = document.getElementById('timestamp').value;
+                const timestamp = parseDateStringToTimestamp(timestampString);
+
+                // Create a reference to the collection and subcollection
+                const zapasyRef = doc(collection(db, date), "zapasy");
+
+                try {
+                    await setDoc(zapasyRef, {
+                        matches: matches,
+                        tips: tips,
+                        time: timestamp
+                    });
+                    alert('Data successfully written!');
+                } catch (error) {
+                    console.error('Error writing document: ', error);
+                }
+            });
+
+            document.getElementById('resultsForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const dateString = document.getElementById('resultsDate').value;
+                const date = parseTimeStringToTimestamp(dateString);
+                const results = document.getElementById('results').value.split(',');
+
+                // Create a reference to the collection and subcollection
+                const zapasyRef = doc(collection(db, date), "results");
+
+                try {
+                    await setDoc(zapasyRef, {
+                        tips: results,
+                    });
+                    alert('Data successfully written!');
+                } catch (error) {
+                    console.error('Error writing document: ', error);
+                }
+            });
+        });
+    </script>
+    <style>
+        a {
+            background-color: red;
+            color: white;
+            padding: 14px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px;
+            }
+    </style>
+</head>
+<body>
+    <h1>Insert Match Data</h1>
+    <form id="dataForm">
+        <label for="date">Date (DD.MM.YYYY):</label>
+        <input type="date" id="date" name="date" required><br><br>
+
+        <label for="matches">Matches (comma separated):</label>
+        <textarea id="matches" name="matches" required></textarea><br><br>
+
+        <label for="tips">Tips (comma separated):</label>
+        <textarea id="tips" name="tips" required></textarea><br><br>
+
+        <label for="timestamp">Timestamp:</label>
+        <input type="datetime-local" id="timestamp" name="timestamp" required><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <h1>Insert Results Data</h1>
+    <form id="resultsForm">
+        <label for="resultsDate">Date (DD.MM.YYYY):</label>
+        <input type="date" id="resultsDate" name="resultsDate" required><br><br>
+
+        <label for="results">Results (comma separated):</label>
+        <textarea id="results" name="results" required></textarea><br><br>
+
+        <input type="submit" value="Submit Results">
+    </form>
+
+    <a href="table.html">Tabulka</a></br>
+
+    <a href="table.html">Vyhodnocení</a>
+</body>
+</html>
