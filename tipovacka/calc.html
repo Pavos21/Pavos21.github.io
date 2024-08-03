@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Tips</title>
+    <style>
+        .highlight-green {
+            background-color: lightgreen;
+        }
+        .highlight-red {
+            background-color: lightcoral;
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
+            authDomain: "tipsport-tipovacka.firebaseapp.com",
+            projectId: "tipsport-tipovacka",
+            storageBucket: "tipsport-tipovacka.appspot.com",
+            messagingSenderId: "198960405925",
+            appId: "1:198960405925:web:b159a12d4177da420f5c4c",
+            measurementId: "G-WD5R3BFV3K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function fetchTipsAndCompare(date) {
+            const dateCollectionRef = collection(db, date);
+            const snapshot = await getDocs(dateCollectionRef);
+
+            // Fetch results and zapasy points
+            const resultsDocRef = doc(db, `${date}/results`);
+            const zapasyDocRef = doc(db, `${date}/zapasy`);
+            const resultsDocSnap = await getDoc(resultsDocRef);
+            const zapasyDocSnap = await getDoc(zapasyDocRef);
+
+            const resultsTips = resultsDocSnap.exists() ? resultsDocSnap.data().tips : [];
+            const pointsArray = zapasyDocSnap.exists() ? zapasyDocSnap.data().points : [];
+
+            let usersList = [];
+
+            snapshot.forEach(docSnap => {
+                const username = docSnap.id;
+                const userTips = docSnap.data().tips;
+                if (username !== "results" && username !== "zapasy") {
+                    usersList.push({ name: username, tips: userTips });
+                }
+            });
+
+            // Sort users alphabetically
+            usersList.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Display results, points, and users tips in the table
+            displayResultsAndTips(resultsTips, pointsArray, usersList);
+        }
+
+        function displayResultsAndTips(resultsTips, pointsArray, usersList) {
+            const tableBody = document.getElementById("users-table-body");
+            tableBody.innerHTML = ''; // Clear existing content
+
+            try {
+                // Create row for results tips
+                const resultsRow = document.createElement("tr");
+
+                const resultsNameCell = document.createElement("td");
+                resultsNameCell.textContent = "Results";
+                resultsNameCell.style.fontWeight = "bold";
+                resultsNameCell.style.textAlign = "center"; // Center text
+                resultsRow.appendChild(resultsNameCell);
+
+                resultsTips.forEach(result => {
+                    const cell = document.createElement("td");
+                    cell.style.color = "red";
+                    cell.style.fontWeight = "bold";
+                    cell.style.textAlign = "center"; // Center text
+                    cell.textContent = result;
+                    resultsRow.appendChild(cell);
+                });
+
+                tableBody.appendChild(resultsRow);
+            } catch (error) {
+                console.error("Error displaying results tips:", error);
+            }
+
+            try {
+                // Create row for points
+                const pointsRow = document.createElement("tr");
+
+                const pointsNameCell = document.createElement("td");
+                pointsNameCell.textContent = "Points";
+                pointsNameCell.style.fontWeight = "bold";
+                pointsNameCell.style.textAlign = "center"; // Center text
+                pointsRow.appendChild(pointsNameCell);
+
+                pointsArray.forEach(point => {
+                    const cell = document.createElement("td");
+                    cell.style.color = "blue";
+                    cell.style.fontWeight = "bold";
+                    cell.style.textAlign = "center"; // Center text
+                    cell.textContent = point;
+                    pointsRow.appendChild(cell);
+                });
+
+                tableBody.appendChild(pointsRow);
+            } catch (error) {
+                console.error("Error displaying points data:", error);
+            }
+
+            // Create rows for each user
+            usersList.forEach(user => {
+                const row = document.createElement("tr");
+
+                // User name cell
+                const nameCell = document.createElement("td");
+                nameCell.textContent = user.name;
+                nameCell.style.textAlign = "center"; // Center text
+                row.appendChild(nameCell);
+
+                let totalPoints = 0; // Initialize total points for the user
+
+                user.tips.forEach((tip, index) => {
+                    const cell = document.createElement("td");
+                    cell.textContent = tip;
+                    cell.style.textAlign = "center"; // Center text
+
+                    try {
+                        if (tip === resultsTips[index]) {
+                            cell.classList.add("highlight-green");
+                            const pointValue = parseFloat(pointsArray[index]); // Convert to number
+                            totalPoints += !isNaN(pointValue) ? pointValue : 0; // Add points for correct tips
+                        } else {
+                            cell.classList.add("highlight-red");
+                        }
+                    } catch (error) {
+                        console.error("Error processing user tips:", error);
+                    }
+
+                    row.appendChild(cell);
+                });
+
+                // Add a new cell for the total points
+                const pointsCell = document.createElement("td");
+                pointsCell.textContent = totalPoints;
+                pointsCell.style.textAlign = "center"; // Center text
+                pointsCell.style.fontWeight = "bold";
+                row.appendChild(pointsCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function updateUsersPoints() {
+            // Confirm before proceeding
+            if (!window.confirm('Are you sure you want to update the points?')) {
+                return;
+            }
+
+            const tableBody = document.getElementById("users-table-body");
+            const rows = tableBody.getElementsByTagName("tr");
+            let successCount = 0;
+            let failureCount = 0;
+
+            for (let i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+                const row = rows[i];
+                const username = row.cells[0].textContent;
+
+                // Skip rows that have "Results" or "Points" in the first cell
+                if (username === "Results" || username === "Points") {
+                    continue;
+                }
+
+                const totalPoints = parseFloat(row.cells[row.cells.length - 1].textContent);
+
+                if (!isNaN(totalPoints)) {
+                    try {
+                        const userDocRef = doc(db, 'points', username);
+                        const userDocSnap = await getDoc(userDocRef);
+
+                        if (userDocSnap.exists()) {
+                            const currentPoints = userDocSnap.data().points || 0;
+                            await updateDoc(userDocRef, {
+                                points: currentPoints + totalPoints
+                            });
+                            successCount++;
+                        } else {
+                            failureCount++;
+                            console.error(`User "${username}" not found.`);
+                        }
+                    } catch (error) {
+                        failureCount++;
+                        console.error(`Error updating points for "${username}":`, error);
+                    }
+                }
+            }
+
+            // Display alert dialog based on success and failure counts
+            if (successCount > 0) {
+                alert(`Successfully updated points for ${successCount} users.`);
+            }
+            if (failureCount > 0) {
+                alert(`Failed to update points for ${failureCount} users.`);
+            }
+        }
+
+        // Function to handle form submission
+        document.getElementById('dateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const selectedDate = document.getElementById('datepicker').value;
+            const formattedDate = formatDate(selectedDate);
+            fetchTipsAndCompare(formattedDate);
+        });
+
+        // Function to format date as DD.MM.YYYY
+        function formatDate(date) {
+            const [yyyy, mm, dd] = date.split('-');
+            return `${dd}.${mm}.${yyyy}`;
+        }
+
+        // Load table based on date from URL parameter on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlDate = getDateFromUrlParams();
+            if (urlDate) {
+                fetchTipsAndCompare(urlDate);
+            } else {
+                // Set today's date as default in the date picker
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('datepicker').value = today;
+            }
+        });
+
+        function getDateFromUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('date');
+        }
+
+        // Add event listener for the update points button
+        document.getElementById('updatePointsButton').addEventListener('click', updateUsersPoints);
+    </script>
+</head>
+<body>
+    <h1>Users Tips</h1>
+    <form id="dateForm">
+        <label for="datepicker">Select Date:</label>
+        <input type="date" id="datepicker" name="datepicker">
+        <button type="submit">Load Tips</button>
+    </form>
+    <br>
+    <table border="1">
+        <tbody id="users-table-body">
+            <!-- Dynamic content will be inserted here -->
+        </tbody>
+    </table>
+    <br>
+    <button id="updatePointsButton">Update Points</button>
+</body>
+</html>
