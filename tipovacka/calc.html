@@ -221,21 +221,20 @@
             return `${dd}.${mm}.${yyyy}`;
         }
 
-        // Load table based on date from URL parameter on page load
+        // Load table and set today's date in the datepicker on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const urlDate = getDateFromUrlParams();
-            if (urlDate) {
-                fetchTipsAndCompare(urlDate);
-            } else {
-                // Set today's date as default in the date picker
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('datepicker').value = today;
-            }
+            // Get today's date in local format (YYYY-MM-DD)
+            const today = getLocalDate();
+            document.getElementById('datepicker').value = today;
         });
 
-        function getDateFromUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('date');
+        // Function to get the current date in YYYY-MM-DD format based on the device's local time
+        function getLocalDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
         // Add event listener for the update points button
