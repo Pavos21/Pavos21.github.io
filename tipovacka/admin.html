@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Insert Data to Firestore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="module">
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -46,6 +47,7 @@
                 const date = parseTimeStringToTimestamp(dateString);
                 const matches = document.getElementById('matches').value.split(',');
                 const tips = document.getElementById('tips').value.split(',');
+                const points = document.getElementById('points').value.split(',');
                 const timestampString = document.getElementById('timestamp').value;
                 const timestamp = parseDateStringToTimestamp(timestampString);
 
@@ -56,6 +58,7 @@
                     await setDoc(zapasyRef, {
                         matches: matches,
                         tips: tips,
+                        points: points,
                         time: timestamp
                     });
                     alert('Data successfully written!');
@@ -109,6 +112,17 @@
         <label for="tips">Tips (comma separated):</label>
         <textarea id="tips" name="tips" required></textarea><br><br>
 
+        <label for="tips">Points (comma separated):</label>
+        <textarea id="points" name="points" required></textarea>
+        <br>
+        <p style="font-weight: 600;">
+            přesný výsledek - 5<br>
+            počet gemů v setu - 4<br>
+            počet setů - 3<br>
+            speciální otázky - 2<br>
+            vítěz utkání - 1<br></p>
+        <br>
+
         <label for="timestamp">Timestamp:</label>
         <input type="datetime-local" id="timestamp" name="timestamp" required><br><br>
 
@@ -126,8 +140,14 @@
         <input type="submit" value="Submit Results">
     </form>
 
-    <a href="table.html">Tabulka</a></br>
-
-    <a href="calc_daily_points.html">Vyhodnocení</a>
+    <h1>Users Table</h1>
+    <button onclick="window.location.href='calc.html'">Vyhodnocení</button><br><br>
 </body>
+<!-- 
+přesný výsledek - 5 bodů
+počet gemů v setu - 4 body
+počet setů - 3 body
+speciální otázky - 2 body
+vítěz utkání - 1 bod 
+-->
 </html>
