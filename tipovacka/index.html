@@ -125,6 +125,54 @@
             text-align: center; /* Center text in cells */
             white-space: nowrap; /* Prevent wrapping within cells */
         }
+
+        #openPopupBtn {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 10vw; /* Button width relative to viewport width */
+            text-align: center; /* Center text inside button */
+            display: block; /* Make button a block-level element */
+            transition-duration: .3s; /* Smooth transition for hover effects */
+            margin: 0 auto; /* Center button horizontally */
+        }
+
+        .popup {
+            display: none; /* Hide popup by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1000; /* Ensure popup is on top */
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #454545;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        
         @media (pointer: coarse) {
             .nickLabel {
                 font-size: 1.2em;
@@ -149,6 +197,17 @@
     <h1>National Bank Open presented by Rogers</h1>
 
     <h2 id="deadline" class="deadline"></h2>
+
+    <button id="openPopupBtn">Jak tipovat?</button>
+
+    <!-- Popup container -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <h2>Information</h2>
+            <p>This is the content of the popup window. You can add more details here about how to tip.</p>
+        </div>
+    </div>
 
     <!-- Form to submit user data -->
     <form id="dataForm">
@@ -395,7 +454,31 @@
         }
 
         // Call function to populate match data on page load
-        document.addEventListener('DOMContentLoaded', populateMatchData);
+        document.addEventListener('DOMContentLoaded', function() {
+            populateMatchData(); // Existing function call
+
+            // Popup functionality
+            const openPopupBtn = document.getElementById('openPopupBtn');
+            const popup = document.getElementById('popup');
+            const closeBtn = document.querySelector('.close-btn');
+
+            // Open popup
+            openPopupBtn.addEventListener('click', function() {
+                popup.style.display = 'block';
+            });
+
+            // Close popup when clicking on close button
+            closeBtn.addEventListener('click', function() {
+                popup.style.display = 'none';
+            });
+
+            // Close popup when clicking outside the popup content
+            window.addEventListener('click', function(event) {
+                if (event.target === popup) {
+                    popup.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
