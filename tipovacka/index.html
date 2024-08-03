@@ -2,20 +2,175 @@
 <html>
 <head>
     <title>Tipsport Tipovačka</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #167be8;
+            color: white;
+            font-family: 'Ubuntu';
+        }
+        h1 {
+            text-align: center;
+        }
+        .deadline {
+            text-align: center;
+            color: #f59a00;
+        }
+        /* Style for the form element */
+        #dataForm {
+            display: flex; /* Use flexbox for alignment */
+            flex-direction: column; /* Arrange children in a column */
+            align-items: center; /* Center items horizontally */
+            margin: 0 auto; /* Center the form horizontally if needed */
+            max-width: 600px; /* Optional: Set a max-width for better layout */
+            padding: 20px; /* Optional: Add padding inside the form */
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        .nickLabel {
+            font-size: 1.2em;
+        }
+
+        /* Style for the input field */
+        .nickInput {
+            padding: 5px; /* Add padding inside the input field */
+            width: 100%; /* Make input field take up full width of its container */
+            max-width: 300px; /* Optional: Limit the maximum width of the input field */
+            border: 1px solid #ccc; /* Add border to the input field */
+            border-radius: 5px; /* Optional: Rounded corners for the input field */
+            text-align: center;
+        }
+
+        /* Style for the submit button */
+        input[type="submit"] {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 20vw;
+            transition-duration: .3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        #dynamicInputFields {
+            margin: 20px auto;
+            padding: 10px;
+            width: fit-content;
+            max-width: 100%;
+            border: 1px solid white;
+            border-radius: 15px;
+            background-color: #454545;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .dynamic-label {
+            display: block;
+        }
+        .dynamic-text {
+            display: block;
+            color: #f59a00;
+        }
+        .dynamic-points {
+            display: block;
+            color: white;
+        }
+        .dynamic-input {
+            text-align: center;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Ensure the table adjusts column widths based on content */
+        table {
+            width: auto; /* Adjust width based on content */
+            max-width: 100%; /* Prevent table from exceeding container width */
+            border-collapse: collapse; /* Merge table borders */
+            margin: 20px auto; /* Center the table and add some margin */
+            border-radius: 10px; /* Rounded corners for the table */
+            overflow: hidden; /* Hide any overflow from rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            table-layout: auto; /* Automatically adjust column widths based on content */
+        }
+
+        /* Style table headers */
+        th {
+            background-color: #f59a00; /* Green background for header */
+            color: white; /* White text color */
+            padding: 10px; /* Padding inside header cells */
+            text-align: center; /* Center text */
+            font-weight: normal;
+        }
+
+        /* Style table rows */
+        tr:nth-child(even) {
+            background-color: #2e2e2e; /* Darker gray for even rows */
+        }
+
+        tr:nth-child(odd) {
+            background-color: #454545; /* Light gray for odd rows */
+        }
+
+        /* Style table cells */
+        td {
+            padding: 10px; /* Padding inside cells */
+            border: 1px solid #ddd; /* Light border around cells */
+            text-align: center; /* Center text in cells */
+            white-space: nowrap; /* Prevent wrapping within cells */
+        }
+        @media (pointer: coarse) {
+            .nickLabel {
+                font-size: 1.2em;
+            }
+
+            .nickInput {
+                padding: 5px; /* Add padding inside the input field */
+                width: 100%; /* Make input field take up full width of its container */
+                max-width: 80%; /* Optional: Limit the maximum width of the input field */
+                border: 1px solid #ccc; /* Add border to the input field */
+                border-radius: 5px; /* Optional: Rounded corners for the input field */
+                text-align: center;
+            }
+
+            input[type="submit"] {
+                width: 35vw;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1 style="color: red;">NETIPUJTE - zatím to není hotové</h1>
-    <h3>Nechce se mi vás furt mazat z databáze</h3>
+    <h1>National Bank Open presented by Rogers</h1>
 
-    <h3 id="deadline" class="deadline"></h3>
+    <h2 id="deadline" class="deadline"></h2>
 
     <!-- Form to submit user data -->
     <form id="dataForm">
-        <label for="name">Tipsport/Chance nick:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+        <label class="nickLabel" for="name">Tipsport/Chance nick:</label><br>
+        <input class="nickInput" type="text" id="name" name="name" required maxlength="40"><br><br>
         <div id="dynamicInputFields"></div>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Odeslat">
     </form>
+
+    <h1>Žebříček</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Pořadí</th>
+                <th>Nick</th>
+                <th>Body celkem</th>
+            </tr>
+        </thead>
+        <tbody id="users-table-body">
+            <!-- Dynamic content will be inserted here -->
+        </tbody>
+    </table>
 
     <script type="module">
         // Your existing Firebase and form submission code...
@@ -57,23 +212,67 @@
             const tips = Array.from(document.querySelectorAll('.tip')).map(input => input.value);
 
             try {
-                const userDocRef = doc(db, currentDate, name);
-                const userDocSnap = await getDoc(userDocRef);
+                const zapasyDocRef = doc(db, currentDate, 'zapasy');
+                const zapasyDocSnap = await getDoc(zapasyDocRef);
 
-                if (userDocSnap.exists()) {
-                    alert("❗Tento uživatel má už dnes natipováno❗\n Nelze tipovat 2x ani měnit tipy");
+                if (zapasyDocSnap.exists()) {
+                    const data = zapasyDocSnap.data();
+                    const timestamp = data.time;
+
+                    if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+                        const currentTime = new Date();
+                        const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+
+                        if (currentTime > deadlineTime) {
+                            alert("❗Tipování je uzavřeno. Nelze odeslat tipy po deadline❗");
+                            return; // Exit the function if the deadline has passed
+                        }
+                    } else {
+                        console.error("Timestamp field is not a valid Firestore Timestamp object.");
+                        alert("Error: Invalid timestamp in database.");
+                        return;
+                    }
                 } else {
-                    await setDoc(userDocRef, {
-                        tips: tips
+                    console.log("No such document with ID 'zapasy'!");
+                    alert("Error: No match data found for today.");
+                    return;
+                }
+            } catch (error) {
+                console.error("Error getting document: ", error);
+                alert("Error checking deadline.");
+                return;
+            }
+
+            try {
+                // Check if the user already exists in the "points" collection
+                const pointsDocRef = doc(db, 'points', name);
+                const pointsDocSnap = await getDoc(pointsDocRef);
+
+                if (!pointsDocSnap.exists()) {
+                    // If the user does not exist in the "points" collection, create a new document with initial points value
+                    await setDoc(pointsDocRef, {
+                        points: 0
                     });
-                    console.log("Document written with ID: ", name);
-                    alert("Úspěšně odesláno ✅");
                 }
             } catch (error) {
                 console.error("Error adding document: ", error);
                 alert("Error submitting data.");
             }
+
+            try {
+                const userDocRef = doc(db, currentDate, name);
+
+                await setDoc(userDocRef, {
+                    tips: tips
+                });
+                console.log("Document written with ID: ", name);
+                alert("Úspěšně odesláno ✅");
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Error submitting data.");
+            }
         });
+
 
         // Function to populate match data from Firestore and create dynamic input fields
         async function populateMatchData() {
@@ -89,6 +288,7 @@
                     const data = zapasyDocSnap.data();
                     const tips = data.tips;
                     const matches = data.matches;
+                    const points = data.points;
                     const timestamp = data.time;
 
                     // Check if 'timestamp' is a Firestore Timestamp object
@@ -104,24 +304,31 @@
                             // Create dynamic input fields
                             const tipLabel = document.createElement('label');
                             tipLabel.textContent = `Zápas: ${matches[i]}`;
-
-                            // Create a line break
-                            const lineBreak = document.createElement('br');
+                            tipLabel.classList.add('dynamic-label');
 
                             // Create second line text node
-                            const tipText = document.createTextNode(`Tipovat: ${tips[i]}`);
+                            const tipText = document.createElement('span');
+                            tipText.textContent = `Tipovat: ${tips[i]}`;
+                            tipText.classList.add('dynamic-text');
+
+                            const pointsText = document.createElement('span');
+                            pointsText.textContent = `Body: ${points[i]}`;
+                            pointsText.classList.add('dynamic-points');
 
                             // Create input element
                             const tipInput = document.createElement('input');
                             tipInput.type = 'text';
-                            tipInput.classList.add('tip');
+                            tipInput.classList.add('dynamic-input', 'tip');
                             tipInput.name = `tip${i}`;
                             tipInput.required = true;
+                            tipInput.maxLength = 40;
 
                             // Append elements to dynamicInputFieldsDiv
                             dynamicInputFieldsDiv.appendChild(tipLabel);
-                            dynamicInputFieldsDiv.appendChild(lineBreak);
+                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
                             dynamicInputFieldsDiv.appendChild(tipText);
+                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                            dynamicInputFieldsDiv.appendChild(pointsText);
                             dynamicInputFieldsDiv.appendChild(document.createElement('br'));
                             dynamicInputFieldsDiv.appendChild(tipInput);
                             dynamicInputFieldsDiv.appendChild(document.createElement('br'));
@@ -136,6 +343,55 @@
             } catch (error) {
                 console.error("Error getting document: ", error);
             }
+
+            const pointsCollection = collection(db, "points");
+            const pointsSnapshot = await getDocs(pointsCollection);
+            let usersList = [];
+
+            pointsSnapshot.forEach(doc => {
+                const username = doc.id;
+                const points = doc.data().points || 0;
+                // console.log(`Username: ${username}, Points: ${points}`);
+                usersList.push({ name: username, points: points });
+            });
+
+            usersList.sort((a, b) => b.points - a.points);
+
+            const tableBody = document.getElementById("users-table-body");
+            let previousPoints = null; // Variable to keep track of the previous points
+            let previousNumber = 1; // Variable to keep track of the previous row number
+
+            usersList.forEach((user, index) => {
+                const row = document.createElement("tr");
+
+                // Determine the row number
+                let rowNumber;
+                if (previousPoints !== null && user.points === previousPoints) {
+                    rowNumber = previousNumber; // Same number as the previous if points are equal
+                } else {
+                    rowNumber = previousNumber = index + 1; // Update to the current index + 1
+                    previousPoints = user.points; // Update previous points to current points
+                }
+
+                // Create and append the row number cell
+                const rowNumberCell = document.createElement("td");
+                rowNumberCell.textContent = `${rowNumber}.`;
+                row.appendChild(rowNumberCell);
+
+                // Create and append the user name cell
+                const nameCell = document.createElement("td");
+                nameCell.textContent = user.name;
+                row.appendChild(nameCell);
+
+                // Create and append the points cell
+                const pointsCell = document.createElement("td");
+                pointsCell.style.textAlign = "center";
+                pointsCell.textContent = user.points;
+                row.appendChild(pointsCell);
+
+                // Append the row to the table body
+                tableBody.appendChild(row);
+            });
         }
 
         // Call function to populate match data on page load
