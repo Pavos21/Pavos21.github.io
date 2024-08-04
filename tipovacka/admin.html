@@ -7,7 +7,7 @@
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-        import { getFirestore, doc, setDoc, collection, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -26,16 +26,29 @@
         const db = getFirestore(app);
 
         // Helper function to parse date string to Firestore Timestamp
-
-        function parseTimeStringToTimestamp(dateString) {
-            const [year, month, day] = dateString.split('-');
-            const formattedDate = `${day}.${month}.${year}`;
-            return formattedDate;
-        }
-
         function parseDateStringToTimestamp(dateString) {
             const date = new Date(dateString);
             return Timestamp.fromDate(date);
+        }
+
+        function formatDateToCollectionName(dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${day}.${month}.${year}`;
+        }
+
+        async function copyCollection(oldCollectionName, newCollectionName) {
+            const oldCollectionRef = collection(db, oldCollectionName);
+            const newCollectionRef = collection(db, newCollectionName);
+
+            const snapshot = await getDocs(oldCollectionRef);
+            const batch = writeBatch(db);
+
+            snapshot.forEach((docSnapshot) => {
+                const newDocRef = doc(newCollectionRef, docSnapshot.id);
+                batch.set(newDocRef, docSnapshot.data());
+            });
+
+            await batch.commit();
         }
 
         // Form submission handler
@@ -44,7 +57,7 @@
                 event.preventDefault();
 
                 const dateString = document.getElementById('date').value;
-                const date = parseTimeStringToTimestamp(dateString);
+                const date = formatDateToCollectionName(dateString);
                 const matches = document.getElementById('matches').value.split(',');
                 const tips = document.getElementById('tips').value.split(',');
                 const points = document.getElementById('points').value.split(',');
@@ -71,7 +84,7 @@
                 event.preventDefault();
 
                 const dateString = document.getElementById('resultsDate').value;
-                const date = parseTimeStringToTimestamp(dateString);
+                const date = formatDateToCollectionName(dateString);
                 const results = document.getElementById('results').value.split(',');
 
                 // Create a reference to the collection and subcollection
@@ -86,19 +99,49 @@
                     console.error('Error writing document: ', error);
                 }
             });
+
+            document.getElementById('copyForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const oldDate = document.getElementById('oldDate').value;
+                const newDate = document.getElementById('newDate').value;
+                const oldCollectionName = formatDateToCollectionName(oldDate);
+                const newCollectionName = formatDateToCollectionName(newDate);
+
+                try {
+                    await copyCollection(oldCollectionName, newCollectionName);
+                    alert('Collection successfully copied!');
+                } catch (error) {
+                    console.error('Error copying collection: ', error);
+                }
+            });
+
+            document.getElementById('waitForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const waitDate = document.getElementById('waitDate').value;
+                const formattedDate = formatDateToCollectionName(waitDate); // Ensure date is formatted as DD.MM.YYYY
+
+                const waitCollectionRef = collection(db, formattedDate);
+                const zapasyRef = doc(waitCollectionRef, "zapasy");
+
+                const waitData = {
+                    matches: ["Čeká se na zápasy"],
+                    points: ["---"],
+                    tips: ["---"],
+                    time: Timestamp.fromDate(new Date('2024-01-01T00:00:00Z'))
+                };
+
+                try {
+                    await setDoc(zapasyRef, waitData);
+                    alert('Wait date successfully added!');
+                } catch (error) {
+                    console.error('Error adding wait date: ', error);
+                }
+            });
+
         });
     </script>
-    <style>
-        a {
-            background-color: red;
-            color: white;
-            padding: 14px 25px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            margin: 20px;
-            }
-    </style>
 </head>
 <body>
     <h1>Insert Match Data</h1>
@@ -112,7 +155,7 @@
         <label for="tips">Tips (comma separated):</label>
         <textarea id="tips" name="tips" required></textarea><br><br>
 
-        <label for="tips">Points (comma separated):</label>
+        <label for="points">Points (comma separated):</label>
         <textarea id="points" name="points" required></textarea>
         <br>
         <p style="font-weight: 600;">
@@ -142,6 +185,25 @@
 
     <h1>Users Table</h1>
     <button onclick="window.location.href='calc.html'">Vyhodnocení</button><br><br>
+
+    <h1>Add Waiting</h1>
+    <form id="waitForm">
+        <label for="waitDate">Wait Date (DD.MM.YYYY):</label>
+        <input type="date" id="waitDate" name="waitDate" required><br><br>
+
+        <input type="submit" value="Add Wait Date">
+    </form>
+
+    <h1>Move Collection</h1>
+    <form id="copyForm">
+        <label for="oldDate">Old Collection Date (DD.MM.YYYY):</label>
+        <input type="date" id="oldDate" name="oldDate" required><br><br>
+
+        <label for="newDate">New Collection Date (DD.MM.YYYY):</label>
+        <input type="date" id="newDate" name="newDate" required><br><br>
+
+        <input type="submit" value="Move Collection">
+    </form>
 </body>
 <!-- 
 přesný výsledek - 5 bodů
