@@ -129,9 +129,12 @@
                     cell.style.textAlign = "center"; // Center text
 
                     try {
-                        // Convert both tip and result to lowercase for case-insensitive comparison
-                        const lowerCaseTip = tip.toLowerCase();
-                        const lowerCaseResultTip = resultsTips[index].toLowerCase();
+                        // Check if resultsTips[index] is defined before using it
+                        const resultTip = resultsTips[index] !== undefined ? resultsTips[index] : "";
+
+                        // Convert both tip and resultsTips[index] to lowercase for case-insensitive comparison
+                        const lowerCaseTip = tip ? tip.toLowerCase() : "";
+                        const lowerCaseResultTip = resultTip.toLowerCase();
 
                         if (lowerCaseTip === lowerCaseResultTip) {
                             cell.classList.add("highlight-green");
