@@ -129,7 +129,11 @@
                     cell.style.textAlign = "center"; // Center text
 
                     try {
-                        if (tip === resultsTips[index]) {
+                        // Convert both tip and result to lowercase for case-insensitive comparison
+                        const lowerCaseTip = tip.toLowerCase();
+                        const lowerCaseResultTip = resultsTips[index].toLowerCase();
+
+                        if (lowerCaseTip === lowerCaseResultTip) {
                             cell.classList.add("highlight-green");
                             const pointValue = parseFloat(pointsArray[index]); // Convert to number
                             totalPoints += !isNaN(pointValue) ? pointValue : 0; // Add points for correct tips
@@ -142,6 +146,7 @@
 
                     row.appendChild(cell);
                 });
+
 
                 // Add a new cell for the total points
                 const pointsCell = document.createElement("td");
