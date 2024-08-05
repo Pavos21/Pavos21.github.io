@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Tipsport Tipovačka</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #167be8;
+            color: white;
+            font-family: 'Ubuntu', sans-serif;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            padding-top: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #username, #password {
+            padding: 5px; /* Add padding inside the input field */
+            width: 100%; /* Make input field take up full width of its container */
+            max-width: 300px; /* Optional: Limit the maximum width of the input field */
+            border: 1px solid #ccc; /* Add border to the input field */
+            border-radius: 5px; /* Optional: Rounded corners for the input field */
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 20vw;
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        label, input, button {
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .data-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .data-value {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .data-header {
+            flex-basis: 100%;
+            background-color: #f59a00;
+            color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Media query for phone layout */
+        @media (max-width: 600px) {
+            .data-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .data-header {
+                width: 100%; /* Make the header div full width */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="loginForm">
+            <label for="username">Tipsport/Chance nick:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Heslo:</label>
+            <input type="password" id="password" name="password" required>
+            <input type="submit" value="Načíst"/>
+        </form>
+        <div id="tablesContainer"></div>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+        // Import Firebase libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
+            authDomain: "tipsport-tipovacka.firebaseapp.com",
+            projectId: "tipsport-tipovacka",
+            storageBucket: "tipsport-tipovacka.appspot.com",
+            messagingSenderId: "198960405925",
+            appId: "1:198960405925:web:b159a12d4177da420f5c4c",
+            measurementId: "G-WD5R3BFV3K"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const tablesContainer = document.getElementById('tablesContainer');
+            tablesContainer.innerHTML = ''; // Clear previous tables
+
+            try {
+                // Fetch password for the user
+                const pswdDocRef = doc(db, 'passwords', username);
+                const pswdDocSnap = await getDoc(pswdDocRef);
+
+                if (!pswdDocSnap.exists()) {
+                    alert('Tento nick neexistuje');
+                    return;
+                }
+
+                const storedPassword = pswdDocSnap.data().pswd;
+                if (password !== storedPassword) {
+                    alert('❌Špatné heslo❌');
+                    return;
+                }
+
+                // Generate collection names dynamically from "1.kolo" to "7.kolo"
+                const collections = [];
+                for (let i = 1; i <= 7; i++) {
+                    collections.push(`${i}.kolo`);
+                }
+
+                for (const collectionName of collections) {
+                    const userDataRef = doc(db, collectionName, username);
+                    const userDataSnapshot = await getDoc(userDataRef);
+
+                    if (!userDataSnapshot.exists()) {
+                        // Skip if no data found for this collection
+                        continue;
+                    }
+
+                    const userData = userDataSnapshot.data();
+
+                    // Create and populate the data container
+                    const dataContainer = document.createElement('div');
+                    dataContainer.className = 'data-container';
+
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'data-header';
+                    headerDiv.textContent = collectionName;
+                    dataContainer.appendChild(headerDiv);
+
+                    let values = userData[Object.keys(userData)[0]]; // Assuming the key is always the same
+                    if (typeof values === 'string') {
+                        values = values.split(','); // Split comma-separated values
+                    } else if (!Array.isArray(values)) {
+                        values = [values]; // Ensure values is an array
+                    }
+
+                    values.forEach(value => {
+                        const valueDiv = document.createElement('div');
+                        valueDiv.className = 'data-value';
+                        valueDiv.textContent = value.trim(); // Trim any extra spaces
+                        dataContainer.appendChild(valueDiv);
+                    });
+
+                    // Append the data container to the tables container
+                    tablesContainer.appendChild(dataContainer);
+                }
+
+                if (tablesContainer.children.length === 0) {
+                    alert('No data found for user in the available collections.');
+                }
+            } catch (error) {
+                alert('An error occurred: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
