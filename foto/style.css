@@ -1,0 +1,445 @@
+﻿/* Not important. General styling
+------------------------------------------ */
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+    *::before, *::after {
+        box-sizing: inherit;
+    }
+
+body {
+    color: rgba(0,0,0,.87);
+    font-size: 1rem;
+    line-height: 1.5;
+    font-family: Roboto, sans-serif;
+    background: #26A69A;
+    padding: 0;
+    height: 100vh;
+    background-image: linear-gradient(rgba(4,9,30,0.7), rgba(4,9,30,0.7)), url(thumbs/background.jpg);
+    background-position: center;
+    background-size: cover;
+}
+
+/* ↓ PC ↓ */
+
+@media only screen and (min-width: 767px) {
+
+    .menu {
+        height: 10vh;
+        background-color: #afafaf40;
+        box-shadow: 1px 1px 5px 0px var(--gray);
+        position: sticky;
+        top: 0;
+        width: 100%;
+    }
+
+    .logo {
+        float: left;
+        display: block;
+        justify-content: center;
+        align-items: center;
+        margin-left: 1vw;
+        transition: 0.3s;
+    }
+
+    #logo_text {
+        font-family: 'Trebuchet MS';
+    }
+
+    .logo a{
+        line-height: 10vh;
+        text-align: center;
+    }
+
+    .logo a:link {
+        text-decoration: none;
+    }
+
+    .logo a:visited {
+        text-decoration: none;
+    }
+
+    .logo a:hover {
+        text-decoration: none;
+    }
+
+    .logo a:active {
+        text-decoration: none;
+    }
+
+    .logo a img {
+        height: 6vh;
+        border-radius: 0%;
+        object-fit: contain;
+    }
+
+    .links{
+        float: right;
+    }
+
+    .menu a{
+        line-height: 10vh;
+        color: white;
+        font-size: 5vh;
+        padding: 0 1.5vh;
+        display: inline-block;
+        transition: 0.3s;
+    }
+
+    .menu a i{
+        color: white;
+        transition: 0.3s;
+    }
+
+    .menu a:hover i{
+        color: #ff1500;
+        transition: 0.3s;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        height: 85vh;
+        justify-content: center;
+    }
+
+    .column {
+        float: left;
+        width: 30%;
+        justify-content: center;
+        margin: auto;
+    }
+
+    .card {
+        height: 60vh;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        transition: 0.5s;
+    }
+
+    .card_text {
+        position: absolute;
+        top: 150%;
+        left: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: 0.5s;
+        font-size: 2rem;
+        color: white;
+        font-weight: 600;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+
+    .tint {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transition: 0.5s;
+    }
+
+    .card:hover .tint {
+        background: #ff1500a0;
+        transition: 0.5s;
+    }
+
+    .card:hover .card_text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+        transition: 0.5s;
+        font-size: 2rem;
+        color: white;
+        font-weight: 600;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+
+    .card__thumbnail {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+        .card__thumbnail > img {
+            height: 100%;
+            width: auto;
+        }
+
+    .bottom {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+        .bottom a {
+            color: white;
+        }
+}
+
+/* ↓ PC column ↓ */
+
+@media only screen and (max-width: 767px) {
+
+    .menu {
+        height: 10vh;
+        background-color: #afafaf40;
+        box-shadow: 1px 1px 5px 0px var(--gray);
+        position: relative;
+        top: 0;
+        width: 100%;
+    }
+
+    .logo {
+        float: left;
+        display: block;
+        justify-content: center;
+        align-items: center;
+        margin-left: 1vw;
+        transition: 0.3s;
+    }
+
+    .logo a {
+        float: left;
+        margin-left: 1.5vh;
+    }
+
+    #logo_text{
+        display: none;
+    }
+
+    .links {
+        float: right;
+    }
+
+    .menu a {
+        line-height: 10vh;
+        color: white;
+        font-size: 5vh;
+        padding: 0 1.5vh;
+        display: inline-block;
+        transition: 0.3s;
+    }
+
+    .menu a i {
+        color: white;
+        transition: 0.3s;
+    }
+
+    .menu a:hover i {
+        color: #ff1500;
+        transition: 0.3s;
+    }
+
+    .wrapper {
+        width: 80%;
+        display: block;
+        margin: auto;
+        margin-top: 2vh;
+        flex-direction: column;
+    }
+
+    .column {
+        width: 100%;
+    }
+
+    .card {
+        height: 25vh;
+        border-radius: 25px;
+        overflow: hidden;
+        margin-top: 2vh;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
+
+    .card_text {
+        position: absolute;
+        top: 150%;
+        left: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: 0.5s;
+        font-size: 2rem;
+        color: white;
+        font-weight: 600;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+
+    .tint {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transition: 0.5s;
+    }
+
+    .card:hover .tint {
+        background: #ff1500a0;
+        transition: 0.5s;
+    }
+
+    .card:hover .card_text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+        transition: 0.5s;
+        font-size: 2rem;
+        color: white;
+        font-weight: 600;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+
+    .card__thumbnail {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+        .card__thumbnail > img {
+            height: auto;
+            width: 100%;
+        }
+
+    .bottom {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+        .bottom a {
+            color: white;
+        }
+}
+
+
+/* ↓ PHONE ↓ */
+@media only screen and (min-width: 200px) and (max-width: 767px) and (hover: none){
+    .menu {
+        height: 10vh;
+        background-color: #afafaf40;
+        box-shadow: 1px 1px 5px 0px var(--gray);
+        position: sticky;
+        top: 0;
+        width: 100%;
+    }
+
+    .logo {
+        float: left;
+        display: block;
+        justify-content: center;
+        align-items: center;
+        margin-left: 1vw;
+        transition: 0.3s;
+    }
+
+    #logo_text {
+        display: none;
+    }
+
+        .logo a {
+            line-height: 10vh;
+            margin-left: 1.5vh;
+        }
+
+    .links {
+        float: right;
+    }
+
+    .menu a {
+        line-height: 10vh;
+        color: white;
+        font-size: 5vh;
+        padding: 0 1.5vh;
+        display: inline-block;
+        transition: 0.3s;
+    }
+
+        .menu a i {
+            color: white;
+            transition: 0.3s;
+        }
+
+        .menu a:hover i {
+            color: #ff1500;
+            transition: 0.3s;
+        }
+
+    .wrapper {
+        width: 80%;
+        display: block;
+        margin: auto;
+        margin-top: 2vh;
+        flex-direction: column;
+    }
+
+    .column {
+        width: 100%;
+    }
+
+    .card {
+        height: 25vh;
+        border-radius: 25px;
+        overflow: hidden;
+        margin-top: 2vh;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
+
+    .card_text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        color: white;
+        font-weight: 600;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+
+    .card__thumbnail {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+        .card__thumbnail > img {
+            height:fit-content;
+            width: 120%;
+        }
+
+    .bottom {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+        .bottom a {
+            color: white;
+            font-family: 'Comic Sans MS';
+        }
+}
