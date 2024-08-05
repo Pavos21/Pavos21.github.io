@@ -13,8 +13,10 @@
         }
     </style>
     <script type="module">
+        // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
@@ -29,13 +31,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function fetchTipsAndCompare(date) {
-            const dateCollectionRef = collection(db, date);
+        async function fetchTipsAndCompare(round) {
+            const dateCollectionRef = collection(db, round);
             const snapshot = await getDocs(dateCollectionRef);
 
             // Fetch results and zapasy points
-            const resultsDocRef = doc(db, `${date}/results`);
-            const zapasyDocRef = doc(db, `${date}/zapasy`);
+            const resultsDocRef = doc(db, `${round}/results`);
+            const zapasyDocRef = doc(db, `${round}/zapasy`);
             const resultsDocSnap = await getDoc(resultsDocRef);
             const zapasyDocSnap = await getDoc(zapasyDocRef);
 
@@ -118,7 +120,7 @@
                 // User name cell
                 const nameCell = document.createElement("td");
                 nameCell.textContent = user.name;
-                nameCell.style.textAlign = "left"; // Left text
+                nameCell.style.textAlign = "left"; // Center text
                 row.appendChild(nameCell);
 
                 let totalPoints = 0; // Initialize total points for the user
@@ -215,35 +217,32 @@
             }
         }
 
+        // Load initial value from database for Active Round
+        async function loadActiveRound() {
+            const zapasyDocRef = doc(db, 'active', 'round');
+            try {
+                const zapasyDocSnap = await getDoc(zapasyDocRef);
+                if (zapasyDocSnap.exists()) {
+                    const data = zapasyDocSnap.data();
+                    const active = data.active;
+                    document.getElementById('roundSelect').value = active;
+                } else {
+                    console.log('No such document!');
+                }
+            } catch (error) {
+                console.error('Error getting document:', error);
+            }
+        }
+
+        // Load the initial value when the page loads
+        window.onload = loadActiveRound;
+
         // Function to handle form submission
         document.getElementById('dateForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            const selectedDate = document.getElementById('datepicker').value;
-            const formattedDate = formatDate(selectedDate);
-            fetchTipsAndCompare(formattedDate);
+            const roundSelect = document.getElementById('roundSelect').value;
+            fetchTipsAndCompare(roundSelect);
         });
-
-        // Function to format date as DD.MM.YYYY
-        function formatDate(date) {
-            const [yyyy, mm, dd] = date.split('-');
-            return `${dd}.${mm}.${yyyy}`;
-        }
-
-        // Load table and set today's date in the datepicker on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get today's date in local format (YYYY-MM-DD)
-            const today = getLocalDate();
-            document.getElementById('datepicker').value = today;
-        });
-
-        // Function to get the current date in YYYY-MM-DD format based on the device's local time
-        function getLocalDate() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
 
         // Add event listener for the update points button
         document.getElementById('updatePointsButton').addEventListener('click', updateUsersPoints);
@@ -252,8 +251,8 @@
 <body>
     <h1>Users Tips</h1>
     <form id="dateForm">
-        <label for="datepicker">Select Date:</label>
-        <input type="date" id="datepicker" name="datepicker">
+        <label for="roundSelect">Select Date:</label>
+        <input type="text" id="roundSelect" name="roundSelect" required>
         <button type="submit">Load Tips</button>
     </form>
     <br>
