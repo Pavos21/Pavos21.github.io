@@ -129,7 +129,7 @@
 
         #openPopupBtn {
             padding: 10px 20px; /* Add padding inside the button */
-            background-color: #f59a00; /* Button background color */
+            background-color: #f59a00; /* Initial button background color */
             color: white; /* Button text color */
             border: none; /* Remove default border */
             border-radius: 5px; /* Rounded corners for the button */
@@ -140,6 +140,19 @@
             margin: 0 auto; /* Center button horizontally */
             box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
             transition-duration: .3s;
+            animation: blink 0.5s infinite; /* Apply the blink animation */
+        }
+
+        @keyframes blink {
+            0% {
+                background-color: #f59a00; /* Initial color */
+            }
+            50% {
+                background-color: #ff4000; /* Blink to this color */
+            }
+            100% {
+                background-color: #f59a00; /* Back to initial color */
+            }
         }
 
         #openPopupBtn:hover {
@@ -239,7 +252,7 @@
     <!-- Form to submit user data -->
     <form id="dataForm">
         <label class="nickLabel" for="name">Tipsport/Chance nick:</label><br>
-        <input class="nickInput" type="text" id="name" name="name" required maxlength="40"><br><br>
+        <input class="nickInput" type="text" id="name" name="name" required maxlength="40">
         <div id="dynamicInputFields"></div>
         <input type="submit" value="Odeslat">
     </form>
@@ -386,6 +399,11 @@
                     }
 
                     if (tips && matches && tips.length === matches.length) {
+                        const redText = document.createElement('p');
+                        redText.style.color = `red`;
+                        redText.textContent = `Pište tipy ve formátu, jak je uvedeno v kulatých závorkách`;
+                        dynamicInputFieldsDiv.appendChild(redText);
+
                         for (let i = 0; i < tips.length; i++) {
                             // Create dynamic input fields
                             const tipLabel = document.createElement('label');
