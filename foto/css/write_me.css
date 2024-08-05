@@ -1,0 +1,202 @@
+﻿
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,700");
+
+*{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-image: linear-gradient(rgba(4,9,30,0.7), rgba(4,9,30,0.7)), url(../thumbs/background.jpg);
+    background-position: center;
+    background-size: cover;
+}
+
+/*  MENU    */
+
+.menu {
+    height: 10vh;
+    background-color: #afafaf40;
+    box-shadow: 1px 1px 5px 0px var(--gray);
+    position: sticky;
+    top: 0;
+    width: 100%;
+}
+
+.logo {
+    float: left;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    margin-left: 1vw;
+    transition: 0.3s;
+}
+
+    .logo:hover a {
+        color: #ff1500;
+        transition: 0.3s;
+    }
+
+#logo_text {
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+.logo a {
+    line-height: 10vh;
+}
+
+    .logo a:link {
+        text-decoration: none;
+    }
+
+    .logo a:visited {
+        text-decoration: none;
+    }
+
+    .logo a:hover {
+        text-decoration: none;
+    }
+
+    .logo a:active {
+        text-decoration: none;
+    }
+
+    .logo a img {
+        height: 6vh;
+        border-radius: 0%;
+        object-fit: contain;
+    }
+
+.links {
+    float: right;
+}
+
+.menu a {
+    line-height: 10vh;
+    color: white;
+    font-size: 5vh;
+    padding: 0 1.5vh;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+    .menu a i {
+        color: white;
+        transition: 0.3s;
+    }
+
+    .menu a:hover i {
+        color: #ff1500;
+        transition: 0.3s;
+    }
+
+/*  DIALOG  */
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 59px;
+    color: white;
+    font-weight: 600;
+    padding-bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+p {
+    color: white;
+    width: 100%;
+    text-align: center;
+}
+
+p, input, textarea, label{
+    font-family: 'Poppins', sans-serif;
+}
+
+.container{
+    max-width: 80vw;
+    height: 89vh;
+    margin: 0 auto;
+}
+
+form {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+    padding: 20px 0;
+}
+
+input, textarea, label {
+    display: block;
+    margin: 0auto;
+    width: 100%;
+    color: #828282;
+}
+
+input, textarea {
+    background-color: transparent;
+    border: 0;
+    border-bottom: 2px solid white;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    transition: 0.2s;
+    resize: none;
+}
+
+input[type="submit"] {
+    background-color: #ff1500;
+    padding: 15px 0;
+    color: white;
+    font-size: 18px;
+    border-bottom: none;
+    margin-top: 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    border: 3px solid #ff1500;
+    transition: 0.5s;
+}
+
+input[type="submit"]:hover {
+    background-color: #ff150055;
+    transform: scale(1.1);
+    border: 3px solid #ff1500;
+    transition: 0.5s;
+}
+
+input:focus, textarea:focus{
+    border-radius: 20px;
+    outline: 1px solid white;
+    transition: 0.2s;
+}
+
+
+a {
+    color: #828282;
+    font-style: italic;
+}
+
+a:hover {
+    color: #fff;
+}
+
+
+/*  BOTTOM  */
+.bottom {
+    position: sticky;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-family: 'Comic Sans MS';
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+    .bottom a {
+        color: white;
+    }
