@@ -7,7 +7,7 @@
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-        import { getFirestore, doc, setDoc, collection, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -51,28 +51,77 @@
             await batch.commit();
         }
 
+        // Load initial value from database for Active Round
+        async function loadActiveRound() {
+            const zapasyDocRef = doc(db, 'active', 'round');
+            try {
+                const zapasyDocSnap = await getDoc(zapasyDocRef);
+                if (zapasyDocSnap.exists()) {
+                    const data = zapasyDocSnap.data();
+                    const active = data.active;
+                    document.getElementById('results').value = active;
+                } else {
+                    console.log('No such document!');
+                }
+            } catch (error) {
+                console.error('Error getting document:', error);
+            }
+        }
+
+        // Load the initial value when the page loads
+        window.onload = loadActiveRound;
+
         // Form submission handler
         document.addEventListener('DOMContentLoaded', function() {
+
+            document.getElementById('activeForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                if (!window.confirm('Are you sure you want to update active round?')) {
+                    return;
+                }
+
+                const activeRound = document.getElementById('results').value;
+                const zapasyDocRef = doc(db, 'active', 'round');
+                try {
+                    await setDoc(zapasyDocRef, { active: activeRound });
+                    alert('Active round successfully set!');
+                } catch (error) {
+                    console.error('Error setting document:', error);
+                    alert('Error setting active round.');
+                }
+            });
+
             document.getElementById('dataForm').addEventListener('submit', async function(event) {
                 event.preventDefault();
 
-                const dateString = document.getElementById('date').value;
-                const date = formatDateToCollectionName(dateString);
+                const round = document.getElementById('round').value;
                 const matches = document.getElementById('matches').value.split(',');
                 const tips = document.getElementById('tips').value.split(',');
                 const points = document.getElementById('points').value.split(',');
                 const timestampString = document.getElementById('timestamp').value;
                 const timestamp = parseDateStringToTimestamp(timestampString);
 
+                const buttonsValue = document.getElementById('buttons').value;
+                const buttons = buttonsValue.split(',').map(part => {
+                    if (part === '2p') return '2:0;2:1;1:2;0:2';
+                    if (part === '3p') return '3:0;3:1;3:2;2:3;1:3;0:3';
+                    if (part === '2s') return '2;3';
+                    if (part === '3s') return '3;4;5';
+                    if (part === 'yn') return 'ano;ne';
+                    if (part === 'g') return '6;7;8;9;10;11;12;13';
+                    return part; // return the part unchanged if no replacement needed
+                });
+
                 // Create a reference to the collection and subcollection
-                const zapasyRef = doc(collection(db, date), "zapasy");
+                const zapasyRef = doc(collection(db, round), "zapasy");
 
                 try {
                     await setDoc(zapasyRef, {
                         matches: matches,
                         tips: tips,
                         points: points,
-                        time: timestamp
+                        time: timestamp,
+                        buttons: buttons
                     });
                     alert('Data successfully written!');
                 } catch (error) {
@@ -83,12 +132,11 @@
             document.getElementById('resultsForm').addEventListener('submit', async function(event) {
                 event.preventDefault();
 
-                const dateString = document.getElementById('resultsDate').value;
-                const date = formatDateToCollectionName(dateString);
-                const results = document.getElementById('results').value.split(',');
+                const resultsRound = document.getElementById('resultsRound').value;
+                const results = document.getElementById('resultsText').value.split(',');
 
                 // Create a reference to the collection and subcollection
-                const zapasyRef = doc(collection(db, date), "results");
+                const zapasyRef = doc(collection(db, resultsRound), "results");
 
                 try {
                     await setDoc(zapasyRef, {
@@ -100,29 +148,12 @@
                 }
             });
 
-            document.getElementById('copyForm').addEventListener('submit', async function(event) {
-                event.preventDefault();
-
-                const oldDate = document.getElementById('oldDate').value;
-                const newDate = document.getElementById('newDate').value;
-                const oldCollectionName = formatDateToCollectionName(oldDate);
-                const newCollectionName = formatDateToCollectionName(newDate);
-
-                try {
-                    await copyCollection(oldCollectionName, newCollectionName);
-                    alert('Collection successfully copied!');
-                } catch (error) {
-                    console.error('Error copying collection: ', error);
-                }
-            });
-
             document.getElementById('waitForm').addEventListener('submit', async function(event) {
                 event.preventDefault();
 
-                const waitDate = document.getElementById('waitDate').value;
-                const formattedDate = formatDateToCollectionName(waitDate); // Ensure date is formatted as DD.MM.YYYY
+                const waitRound = document.getElementById('waitRound').value;
 
-                const waitCollectionRef = collection(db, formattedDate);
+                const waitCollectionRef = collection(db, waitRound);
                 const zapasyRef = doc(waitCollectionRef, "zapasy");
 
                 const waitData = {
@@ -144,20 +175,38 @@
     </script>
 </head>
 <body>
+    <h1>Active round</h1>
+    <form id="activeForm">
+        <label for="results">Active round:</label>
+        <input type="text" id="results" name="results" required></input><br><br>
+
+        <input type="submit" value="Set Active">
+    </form>
+
     <h1>Insert Match Data</h1>
     <form id="dataForm">
-        <label for="date">Date (DD.MM.YYYY):</label>
-        <input type="date" id="date" name="date" required><br><br>
+        <label for="round">Round:</label>
+        <input type="text" id="round" name="round" required></input><br><br>
 
         <label for="matches">Matches (comma separated):</label>
         <textarea id="matches" name="matches" required></textarea><br><br>
 
-        <label for="tips">Tips (comma separated):</label>
+        <label for="tips">To Tip (comma separated):</label>
         <textarea id="tips" name="tips" required></textarea><br><br>
+
+        <label for="buttons">Buttons (comma separated):</label>
+        <textarea id="buttons" name="buttons" required></textarea>
+        <p style="font-weight: 600;">
+            2 sety (2s)<br>
+            3 sety (3s)<br>
+            přesný na 2 (2p)<br>
+            přesný na 3 (3p)<br>
+            ano-ne (yn)<br>
+            gemy v setu 6-13 (g)<br></p>
+        <br>
 
         <label for="points">Points (comma separated):</label>
         <textarea id="points" name="points" required></textarea>
-        <br>
         <p style="font-weight: 600;">
             přesný výsledek - 5<br>
             počet gemů v setu - 4<br>
@@ -166,7 +215,7 @@
             vítěz utkání - 1<br></p>
         <br>
 
-        <label for="timestamp">Timestamp:</label>
+        <label for="timestamp">Deadline:</label>
         <input type="datetime-local" id="timestamp" name="timestamp" required><br><br>
 
         <input type="submit" value="Submit">
@@ -174,11 +223,11 @@
 
     <h1>Insert Results Data</h1>
     <form id="resultsForm">
-        <label for="resultsDate">Date (DD.MM.YYYY):</label>
-        <input type="date" id="resultsDate" name="resultsDate" required><br><br>
+        <label for="round">Round:</label>
+        <input type="text" id="resultsRound" name="resultsRound" required></input><br><br>
 
-        <label for="results">Results (comma separated):</label>
-        <textarea id="results" name="results" required></textarea><br><br>
+        <label for="resultsText">Results (comma separated):</label>
+        <textarea id="resultsText" name="resultsText" required></textarea><br><br>
 
         <input type="submit" value="Submit Results">
     </form>
@@ -188,21 +237,10 @@
 
     <h1>Add Waiting</h1>
     <form id="waitForm">
-        <label for="waitDate">Wait Date (DD.MM.YYYY):</label>
-        <input type="date" id="waitDate" name="waitDate" required><br><br>
+        <label for="waitRound">Wait For Round:</label>
+        <input type="text" id="waitRound" name="waitRound" required></input><br><br>
 
-        <input type="submit" value="Add Wait Date">
-    </form>
-
-    <h1>Move Collection</h1>
-    <form id="copyForm">
-        <label for="oldDate">Old Collection Date (DD.MM.YYYY):</label>
-        <input type="date" id="oldDate" name="oldDate" required><br><br>
-
-        <label for="newDate">New Collection Date (DD.MM.YYYY):</label>
-        <input type="date" id="newDate" name="newDate" required><br><br>
-
-        <input type="submit" value="Move Collection">
+        <input type="submit" value="Add Wait">
     </form>
 </body>
 <!-- 
