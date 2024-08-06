@@ -506,7 +506,7 @@
                         const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
 
                         if (currentTime > deadlineTime) {
-                            alert("❗Tipování je uzavřeno. Nelze odeslat tipy po uzávěrce");
+                            alert("❗Tipování je uzavřeno. Nelze odeslat tipy po uzávěrce❗");
                             return; // Exit the function if the deadline has passed
                         }
                     } else {
@@ -627,10 +627,19 @@
 
                             // Check if 'timestamp' is a Firestore Timestamp object
                             if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+                                const currentTime = new Date();
+                                const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
                                 const deadlineElement = document.getElementById('deadline');
-                                deadlineElement.textContent = `Uzávěrka: ${formatTimestamp(timestamp)}`;
+
+                                if (currentTime > deadlineTime) {
+                                    deadlineElement.style.color = "red";
+                                    deadlineElement.textContent = "Je po uzávěrce";
+                                } else {
+                                    deadlineElement.textContent = `Uzávěrka: ${formatTimestamp(timestamp)}`;
+                                }
                             } else {
                                 console.error("Timestamp field is not a valid Firestore Timestamp object.");
+                                alert("Error: Invalid timestamp in database.");
                             }
 
                             if (tips && matches && tips.length === matches.length) {
