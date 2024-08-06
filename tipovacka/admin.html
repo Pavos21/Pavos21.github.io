@@ -7,7 +7,7 @@
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, Timestamp, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -171,6 +171,51 @@
                 }
             });
 
+            // Function to rename a document in a Firestore collection
+            async function renameDocument(collectionName, oldDocName, newDocName) {
+                try {
+                    // Reference to the old document
+                    const oldDocRef = doc(db, collectionName, oldDocName);
+                    const oldDocSnap = await getDoc(oldDocRef);
+
+                    if (oldDocSnap.exists()) {
+                        // Get the data from the old document
+                        const data = oldDocSnap.data();
+
+                        // Reference to the new document
+                        const newDocRef = doc(db, collectionName, newDocName);
+
+                        // Set the data to the new document
+                        await setDoc(newDocRef, data);
+
+                        // Delete the old document
+                        await deleteDoc(oldDocRef);
+
+                        console.log(`Document renamed from ${oldDocName} to ${newDocName}`);
+                    } else {
+                        console.log(`Document ${oldDocName} does not exist`);
+                    }
+                } catch (error) {
+                    console.error("Error renaming document: ", error);
+                }
+            }
+
+            document.getElementById('renameForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const rnRound = document.getElementById('rn_round').value;
+                const oldName = document.getElementById('oldName').value;
+                const newName = document.getElementById('newName').value;
+
+                try {
+                    await renameDocument(rnRound, oldName, newName);
+                    alert('Document successfully renamed!');
+                } catch (error) {
+                    console.error('Error renaming document: ', error);
+                    alert('Error renaming document: ' + error.message);
+                }
+            });
+
         });
     </script>
 </head>
@@ -241,6 +286,20 @@
         <input type="text" id="waitRound" name="waitRound" required></input><br><br>
 
         <input type="submit" value="Add Wait">
+    </form>
+
+    <h1>Rename User</h1>
+    <form id="renameForm">
+        <label for="rn_round">For Round:</label>
+        <input type="text" id="rn_round" name="rn_round" required></input><br><br>
+
+        <label for="oldName">Old Name:</label>
+        <input type="text" id="oldName" name="oldName" required><br><br>
+
+        <label for="newName">New Name:</label>
+        <input type="text" id="newName" name="newName" required><br><br>
+
+        <input type="submit" value="Change Name">
     </form>
 </body>
 <!-- 
