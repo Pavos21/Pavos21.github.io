@@ -105,11 +105,9 @@
 
                 const oldDate = document.getElementById('oldDate').value;
                 const newDate = document.getElementById('newDate').value;
-                const oldCollectionName = formatDateToCollectionName(oldDate);
-                const newCollectionName = formatDateToCollectionName(newDate);
 
                 try {
-                    await copyCollection(oldCollectionName, newCollectionName);
+                    await copyCollection(oldDate, newDate);
                     alert('Collection successfully copied!');
                 } catch (error) {
                     console.error('Error copying collection: ', error);
@@ -197,10 +195,10 @@
     <h1>Move Collection</h1>
     <form id="copyForm">
         <label for="oldDate">Old Collection Date (DD.MM.YYYY):</label>
-        <input type="date" id="oldDate" name="oldDate" required><br><br>
+        <input type="text" id="oldDate" name="oldDate" required><br><br>
 
         <label for="newDate">New Collection Date (DD.MM.YYYY):</label>
-        <input type="date" id="newDate" name="newDate" required><br><br>
+        <input type="text" id="newDate" name="newDate" required><br><br>
 
         <input type="submit" value="Move Collection">
     </form>
