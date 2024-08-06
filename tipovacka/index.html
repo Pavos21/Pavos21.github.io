@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="cz">
 <head>
+    <meta charset="UTF-8">
     <title>Tipsport Tipovačka</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
@@ -10,7 +11,7 @@
             color: white;
             font-family: 'Ubuntu';
         }
-        h1 {
+        h1, h2 {
             text-align: center;
         }
         .deadline {
@@ -127,6 +128,10 @@
             white-space: nowrap; /* Prevent wrapping within cells */
         }
 
+        #buttonContainer {
+            text-align: center; /* Center the container */
+        }
+
         #openPopupBtn {
             padding: 10px 20px; /* Add padding inside the button */
             background-color: #f59a00; /* Initial button background color */
@@ -136,11 +141,11 @@
             cursor: pointer; /* Change cursor to pointer on hover */
             width: 10vw; /* Button width relative to viewport width */
             text-align: center; /* Center text inside button */
-            display: block; /* Make button a block-level element */
-            margin: 0 auto; /* Center button horizontally */
+            display: inline-block; /* Make button an inline-block element */
+            margin: 0 10px; /* Add some horizontal margin between buttons */
             box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
             transition-duration: .3s;
-            animation: blink 0.5s infinite; /* Apply the blink animation */
+            /*animation: blink 0.5s infinite; /* Apply the blink animation */
         }
 
         @keyframes blink {
@@ -192,6 +197,114 @@
             font-size: 1.5em;
             cursor: pointer;
         }
+        /* */
+        #whyBtn {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Initial button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 10vw; /* Button width relative to viewport width */
+            text-align: center; /* Center text inside button */
+            display: inline-block; /* Make button an inline-block element */
+            margin: 0 10px; /* Add some horizontal margin between buttons */
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+            animation: blink 0.5s infinite; /* Apply the blink animation */
+        }
+
+        #whyBtn:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        .whyPop {
+            display: none; /* Hide popup by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1000; /* Ensure popup is on top */
+        }
+
+        .why-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #454545;
+            padding: 20px;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 60vw;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+        }
+
+        .close-why {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        /**/
+
+
+        .button-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            gap: 10px; /* Adjust the gap between buttons as needed */
+            flex-wrap: wrap; /* Allow wrapping to the next line if needed */
+        }
+
+        .dynamic-radio-input {
+            display: none; /* Hide the actual radio buttons */
+        }
+
+        .dynamic-radio-label {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: black;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dynamic-radio-label:hover {
+            background-color: #e0e0e0;
+        }
+
+        .dynamic-radio-input:checked + .dynamic-radio-label {
+            background-color: #167be8;
+            color: white;
+            border-color: #167be8;
+        }
+
+        #myTips {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 20vw;
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+        }
+
+        #myTips:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
 
         
         @media (pointer: coarse) {
@@ -212,11 +325,30 @@
                 width: 35vw;
             }
 
-            #openPopupBtn {
-            width: 30vw; /* Button width relative to viewport width */
+            input[type="submit"]:hover {
+                background-color: #f59a00;
+                transition-duration: 0s;
             }
 
-            .popup-content {
+            #myTips {
+                width: 35vw;
+            }
+
+            #myTips:hover {
+                background-color: #f59a00;
+                transition-duration: 0s;
+            }
+
+            #openPopupBtn, #whyBtn {
+                width: 30vw; /* Button width relative to viewport width */
+            }
+
+            #openPopupBtn:hover, #whyBtn:hover {
+                background-color: #f59a00;
+                transition-duration: 0s;
+            }
+
+            .popup-content, .why-content {
                 font-size: 14px;
                 max-width: 85vw;
             }
@@ -226,25 +358,45 @@
 <body>
     <h1>National Bank Open presented by Rogers</h1>
 
+    <h2 id="roundText" class="roundText"></h2>
+
     <h2 id="deadline" class="deadline"></h2>
 
-    <button id="openPopupBtn">Jak tipovat?</button>
+    <div id="buttonContainer">
+        <button id="openPopupBtn">Jak tipovat?</button>
+        <button id="whyBtn">Proč heslo?</button>
+    </div>
+    
 
     <!-- Popup container -->
     <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close-btn">&times;</span>
             <h3>Jak tipovat? 🤔</h3>
-            <p>V první řadě je třeba vyplnit herní nick. Je nutné ho napsat bez chyb, jelikož se při prvním odeslání vytvoří záznam pro body</p>
+            <p>V první řadě je třeba <span style="color: lightcoral;">vyplnit herní nick</span>. Je nutné ho napsat bez chyb, jelikož se při prvním odeslání vytvoří záznam pro body</p>
             <p>V každém kole je potřeba vyplnit stejný nick, aby se body přičítaly</p>
-            <p><span style="color: #f59a00;">Oranžově</span> označené jsou pokyny k tipu na daný zápas (<span style="color: lightcoral;">v závorce je příklad, jak má tip vypadat</span>. Tipy vyhodnocuje automat, který bude brát nepřesné zadání jako chybu a nepřipočítá body).
-                <br><span style="color: lightcoral;">Například: <span style="color: #f59a00;">Tipovat: Vítěz zápasu (Frech-Lys)</span> je potřeba vyplnit pouze jedno jméno ze závorky - v tomto případě "Frech" (bez mezer nebo jiných znaků)</span>
-                <br>Když odešlete tipy s překlepem, lze je do uzávěrky opravit novým odesláním tipů</p>
+            <p>Dále je potřeba <span style="color: lightcoral;">vyplnit heslo</span>. Při prvním přihlášení stačí vyplnit kolonku (čímkoliv, co si zamapatujete, číslo, písmeno, slovo, jméno... Je to jedno). Jedná se o ochranu, aby někdo cizí nemohl měnit Vaše tipy.<br>
+                <span style="color: lightcoral;">Heslo je potřeba si zapamatovat</span>! Při následujícím odesílání tipů nepůjde bez hesla tipy odeslat!</p>
             <p>Nahoře je datum a čas uzávěrky, před tímto datem lze tipy měnit, po vypršení již nelze tipy ukládat!</p>
-            <p>Tipy na zápasy se objeví vždy v 0:00:00</p>
-            <p>Své tipy si nemůžete zpětně prohlížet, doporučuji si je tedy někam zapsat</p>
-            <p>Vždy uvidíte jen celkový počet bodů (nejde vidět dílčí kola ani tipy)</p>
-            <p>Pokud se cokoliv stane (chybný nick atd.), pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
+            <p>Tipy na zápasy se budu snažit zveřejňovat co nejdříve</p>
+            <p>Své tipy si můžete prohlížet kliknutím na <a style="color: #f59a00;" href="tips.html">Moje tipy</a> a následném přihlášení heslem</p>
+            <p>V žebříčku bude vždy celkový součet bodů</p>
+            <p>Pokud se cokoliv stane (chybný nick, zapomenuté heslo atd.), pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
+            <p>Všechno je to jenom pro pobavení, nic vážného, takže přeji příjemnou zábavu 😁</p>
+        </div>
+    </div>
+
+    <!-- Why container -->
+    <div id="whyPop" class="whyPop">
+        <div class="why-content">
+            <span class="close-why">&times;</span>
+            <h3>Proč heslo? 🕵️</h3>
+            <p>Heslo je kvůli tomu, aby ostatní nemohli měnit tipy zadáním cizího nicku</p>
+            <p><span style="color: lightcoral;">Při prvním odesílání</span> tipů <span style="color: lightcoral;">vyplňte heslo</span>, jaké chcete používat (číslo, písmeno, slovo, jméno...). Cokoliv, co si jednoduše <span style="color: lightcoral;">zapamatujete</span></p>
+            <p>Při dalším odesílání tipů už bude potřeba <span style="color: lightcoral;">zadat prvně zadané heslo</span>, aby šlo tipy odeslat</p>
+            <p>Heslo zároveň slouží ke zpřístupnění výpisu tipů</p>
+            <p>Pokud třeba heslo zapomenete nebo ho chcete změnit, pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
+            <p><span style="color: lightcoral;">Heslo zůstane</span> pro všechny budoucí tipovačky <span style="color: lightcoral;">stejné</span>, i když se budou bodové zisky nulovat</p>
             <p>Všechno je to jenom pro pobavení, nic vážného, takže přeji příjemnou zábavu 😁</p>
         </div>
     </div>
@@ -252,10 +404,15 @@
     <!-- Form to submit user data -->
     <form id="dataForm">
         <label class="nickLabel" for="name">Tipsport/Chance nick:</label><br>
-        <input class="nickInput" type="text" id="name" name="name" required maxlength="40">
+        <input class="nickInput" type="text" id="name" name="name" required maxlength="40" autocapitalize="off"><br>
+        <label class="nickLabel" for="name">Heslo:</label><br>
+        <input class="nickInput" type="text" id="pswd" name="pswd" required maxlength="40" autocapitalize="off">
         <div id="dynamicInputFields"></div>
         <input type="submit" value="Odeslat">
     </form>
+
+    <br><br>
+    <button id="myTips" onclick="window.location.href='tips.html'">Moje tipy</button>
 
     <h1>Žebříček</h1>
     <table border="1">
@@ -291,14 +448,6 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        function getCurrentDate() {
-            const today = new Date();
-            const day = String(today.getDate()).padStart(2, '0');
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const year = today.getFullYear();
-            return `${day}.${month}.${year}`;
-        }
-
         function formatTimestamp(timestamp) {
             const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000); // Convert Firestore Timestamp to JavaScript Date
             return date.toLocaleString(); // Format date as localized string
@@ -306,12 +455,46 @@
 
         document.getElementById('dataForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-            const name = document.getElementById('name').value;
-            const currentDate = getCurrentDate();
-            const tips = Array.from(document.querySelectorAll('.tip')).map(input => input.value);
+
+            // Step 1: Check if all radio button groups have a selected value
+            const numMatches = document.querySelectorAll('.button-container').length;
+            const tips = [];
+            for (let i = 0; i < numMatches; i++) {
+                const selectedRadio = document.querySelector(`input[name="tip${i}"]:checked`);
+                if (selectedRadio) {
+                    tips.push(selectedRadio.value);
+                } else {
+                    alert(`Prosím vyberte tip pro ${i + 1}. zápas`);
+                    return; // Exit the function if any tip is not selected
+                }
+            }
+
+            // Step 4: Fetch the current round from Firestore
+            let currentRound;
+            try {
+                const roundDocRef = doc(db, 'active', 'round');
+                const roundDocSnap = await getDoc(roundDocRef);
+
+                if (roundDocSnap.exists()) {
+                    const roundData = roundDocSnap.data();
+                    currentRound = roundData.active; // Assuming 'active' holds the current round
+
+                    if (!currentRound) {
+                        alert('Chyba číslo 100'); // No active round found in the database.
+                        return;
+                    }
+                } else {
+                    alert('Chyba číslo 101'); // Error fetching current round.
+                    return;
+                }
+            } catch (error) {
+                console.error('Error getting current round: ', error);
+                alert('Chyba číslo 102'); // Error fetching current round.
+                return;
+            }
 
             try {
-                const zapasyDocRef = doc(db, currentDate, 'zapasy');
+                const zapasyDocRef = doc(db, currentRound, 'zapasy'); // Use currentRound as the document ID
                 const zapasyDocSnap = await getDoc(zapasyDocRef);
 
                 if (zapasyDocSnap.exists()) {
@@ -342,8 +525,48 @@
                 return;
             }
 
+            // Step 2: Get user input
+            const name = document.getElementById('name').value;
+            const enteredPassword = document.getElementById('pswd').value; // Password entered by the user
+
+            // Step 3: Fetch and verify the stored password from Firestore
+            let storedPassword;
+            let rememberPswd = "";
             try {
-                // Check if the user already exists in the "points" collection
+                const pswdDocRef = doc(db, 'passwords', name);
+                const pswdDocSnap = await getDoc(pswdDocRef);
+
+                if (pswdDocSnap.exists()) {
+                    // User exists, compare entered password with stored password
+                    const pswdData = pswdDocSnap.data();
+                    storedPassword = pswdData.pswd;
+
+                    if (enteredPassword !== storedPassword) {
+                        alert("❌Nesprávné heslo.❌"); // Incorrect password
+                        return;
+                    }
+                } else {
+                    // User does not exist, create a new record with the provided password
+                    try {
+                        await setDoc(pswdDocRef, {
+                            pswd: enteredPassword
+                        });
+                        console.log("New password record created for:", name);
+                        rememberPswd = "\n\n❗Zapamatujte si heslo❗";
+                    } catch (error) {
+                        console.error('Error creating new password record: ', error);
+                        alert('Chyba číslo 111: Chyba při vytváření nového hesla.'); // Error creating new password
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting password: ', error);
+                alert('Chyba číslo 110: Chyba při kontrole hesla.'); // Error checking password
+                return;
+            }
+
+            // Step 5: Check if the user already exists in the "points" collection
+            try {
                 const pointsDocRef = doc(db, 'points', name);
                 const pointsDocSnap = await getDoc(pointsDocRef);
 
@@ -355,20 +578,22 @@
                 }
             } catch (error) {
                 console.error("Error adding document: ", error);
-                alert("Error submitting data.");
+                alert("Chyba číslo 106"); // Error submitting data.
+                return;
             }
 
+            // Step 6: Submit the tips data to the database
             try {
-                const userDocRef = doc(db, currentDate, name);
+                const userDocRef = doc(db, currentRound, name);
 
                 await setDoc(userDocRef, {
                     tips: tips
                 });
                 console.log("Document written with ID: ", name);
-                alert("Úspěšně odesláno ✅");
+                alert("Úspěšně odesláno ✅"+rememberPswd);
             } catch (error) {
                 console.error("Error adding document: ", error);
-                alert("Error submitting data.");
+                alert("Nepovedlo se odeslat\nChyba číslo 107"); // Error submitting data.
             }
         });
 
@@ -379,70 +604,103 @@
             dynamicInputFieldsDiv.innerHTML = '';
 
             try {
-                const currentDate = getCurrentDate();
-                const zapasyDocRef = doc(db, currentDate, 'zapasy');
-                const zapasyDocSnap = await getDoc(zapasyDocRef);
+                // Fetch the current round from Firestore
+                const roundDocRef = doc(db, 'active', 'round');
+                const roundDocSnap = await getDoc(roundDocRef);
 
-                if (zapasyDocSnap.exists()) {
-                    const data = zapasyDocSnap.data();
-                    const tips = data.tips;
-                    const matches = data.matches;
-                    const points = data.points;
-                    const timestamp = data.time;
+                if (roundDocSnap.exists()) {
+                    const roundData = roundDocSnap.data();
+                    const currentRound = roundData.active; // Assuming 'active' holds the current round
 
-                    // Check if 'timestamp' is a Firestore Timestamp object
-                    if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
-                        const deadlineElement = document.getElementById('deadline');
-                        deadlineElement.textContent = `Deadline: ${formatTimestamp(timestamp)}`;
-                    } else {
-                        console.error("Timestamp field is not a valid Firestore Timestamp object.");
-                    }
+                    if (currentRound) {
+                        document.getElementById('roundText').innerText = currentRound;
+                        const zapasyDocRef = doc(db, currentRound, 'zapasy');
+                        const zapasyDocSnap = await getDoc(zapasyDocRef);
 
-                    if (tips && matches && tips.length === matches.length) {
-                        const redText = document.createElement('p');
-                        redText.style.color = `red`;
-                        redText.textContent = `Pište tipy ve formátu, jak je uvedeno v kulatých závorkách`;
-                        dynamicInputFieldsDiv.appendChild(redText);
+                        if (zapasyDocSnap.exists()) {
+                            const data = zapasyDocSnap.data();
+                            const tips = data.tips;
+                            const matches = data.matches;
+                            const points = data.points;
+                            const timestamp = data.time;
+                            const buttons = data.buttons;
 
-                        for (let i = 0; i < tips.length; i++) {
-                            // Create dynamic input fields
-                            const tipLabel = document.createElement('label');
-                            tipLabel.textContent = `Zápas: ${matches[i]}`;
-                            tipLabel.classList.add('dynamic-label');
+                            // Check if 'timestamp' is a Firestore Timestamp object
+                            if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+                                const deadlineElement = document.getElementById('deadline');
+                                deadlineElement.textContent = `Deadline: ${formatTimestamp(timestamp)}`;
+                            } else {
+                                console.error("Timestamp field is not a valid Firestore Timestamp object.");
+                            }
 
-                            // Create second line text node
-                            const tipText = document.createElement('span');
-                            tipText.textContent = `Tipovat: ${tips[i]}`;
-                            tipText.classList.add('dynamic-text');
+                            if (tips && matches && tips.length === matches.length) {
+                                for (let i = 0; i < tips.length; i++) {
+                                    // Create dynamic input fields
+                                    const tipLabel = document.createElement('label');
+                                    tipLabel.textContent = `Zápas: ${matches[i]}`;
+                                    tipLabel.classList.add('dynamic-label');
 
-                            const pointsText = document.createElement('span');
-                            pointsText.textContent = `Body: ${points[i]}`;
-                            pointsText.classList.add('dynamic-points');
+                                    // Create second line text node
+                                    const tipText = document.createElement('span');
+                                    tipText.textContent = `Tipovat: ${tips[i]}`;
+                                    tipText.classList.add('dynamic-text');
 
-                            // Create input element
-                            const tipInput = document.createElement('input');
-                            tipInput.type = 'text';
-                            tipInput.classList.add('dynamic-input', 'tip');
-                            tipInput.name = `tip${i}`;
-                            tipInput.required = true;
-                            tipInput.maxLength = 40;
+                                    const pointsText = document.createElement('span');
+                                    pointsText.textContent = `Body: ${points[i]}`;
+                                    pointsText.classList.add('dynamic-points');
 
-                            // Append elements to dynamicInputFieldsDiv
-                            dynamicInputFieldsDiv.appendChild(tipLabel);
-                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                            dynamicInputFieldsDiv.appendChild(tipText);
-                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                            dynamicInputFieldsDiv.appendChild(pointsText);
-                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                            dynamicInputFieldsDiv.appendChild(tipInput);
-                            dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                    // Append elements to dynamicInputFieldsDiv
+                                    dynamicInputFieldsDiv.appendChild(tipLabel);
+                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                    dynamicInputFieldsDiv.appendChild(tipText);
+                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                    dynamicInputFieldsDiv.appendChild(pointsText);
+                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+
+                                    // Create radio buttons
+                                    if (buttons && buttons[i]) {
+                                        const options = buttons[i].split(';');
+                                        const buttonContainer = document.createElement('div');
+                                        buttonContainer.classList.add('button-container');
+
+                                        options.forEach((option, index) => {
+                                            const radioInput = document.createElement('input');
+                                            const radioId = `tip${i}_${index}`;
+                                            radioInput.type = 'radio';
+                                            radioInput.name = `tip${i}`;
+                                            radioInput.value = option;
+                                            radioInput.id = radioId; // Assign an id to the radio button
+                                            radioInput.classList.add('dynamic-radio-input');
+                                            //radioInput.required = true;
+
+                                            const radioLabel = document.createElement('label');
+                                            radioLabel.textContent = option;
+                                            radioLabel.classList.add('dynamic-radio-label');
+                                            radioLabel.setAttribute('for', radioId); // Set the for attribute to the radio button id
+
+                                            // Append the radio button and label to the container
+                                            buttonContainer.appendChild(radioInput);
+                                            buttonContainer.appendChild(radioLabel);
+                                        });
+
+                                        // Append the button container to dynamicInputFieldsDiv
+                                        dynamicInputFieldsDiv.appendChild(buttonContainer);
+                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                    }
+
+                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                }
+                            } else {
+                                console.error("Tips and matches arrays are not of the same length.");
+                            }
+                        } else {
+                            console.log(`No such document in collection '${currentRound}' with ID 'zapasy'!`);
                         }
-                        
                     } else {
-                        console.error("Tips and matches arrays are not of the same length.");
+                        console.error('No active round found in the database.');
                     }
                 } else {
-                    console.log("No such document with ID 'zapasy'!");
+                    console.error('No document found for the current round.');
                 }
             } catch (error) {
                 console.error("Error getting document: ", error);
@@ -521,6 +779,28 @@
             window.addEventListener('click', function(event) {
                 if (event.target === popup) {
                     popup.style.display = 'none';
+                }
+            });
+
+            // Popup functionality
+            const openWhy = document.getElementById('whyBtn');
+            const why = document.getElementById('whyPop');
+            const closeWhy = document.querySelector('.close-why');
+
+            // Open popup
+            openWhy.addEventListener('click', function() {
+                why.style.display = 'block';
+            });
+
+            // Close popup when clicking on close button
+            closeWhy.addEventListener('click', function() {
+                why.style.display = 'none';
+            });
+
+            // Close popup when clicking outside the popup content
+            window.addEventListener('click', function(event) {
+                if (event.target === why) {
+                    why.style.display = 'none';
                 }
             });
         });
