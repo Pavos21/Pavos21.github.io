@@ -94,6 +94,49 @@
             text-align: center;
         }
 
+        /* Ensure the table adjusts column widths based on content */
+        table {
+            width: auto; /* Adjust width based on content */
+            max-width: 95%; /* Prevent table from exceeding container width */
+            border-collapse: collapse; /* Merge table borders */
+            margin: 20px auto; /* Center the table and add some margin */
+            border-radius: 10px; /* Rounded corners for the table */
+            overflow: hidden; /* Hide any overflow from rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            table-layout: auto; /* Automatically adjust column widths based on content */
+        }
+
+        /* Style table rows */
+        tr:nth-child(even) {
+            background-color: #2e2e2e; /* Darker gray for even rows */
+            font-weight: bold;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #454545; /* Light gray for odd rows */
+        }
+
+        /* Style table cells */
+        td {
+            padding: 10px; /* Padding inside cells */
+            border: 1px solid #ddd; /* Light border around cells */
+            text-align: center; /* Center text in cells */
+            white-space: normal; /* Allow text to wrap */
+            word-break: break-word; /* Break long words */
+        }
+
+        /* Style for the collection name div */
+        .collection-name {
+            background-color: #f59a00;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px auto;
+            max-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
         /* Spinner styles */
         .spinner {
             display: none; /* Hidden by default */
@@ -210,6 +253,9 @@
                     collections.push(`${i}.kolo`);
                 }
 
+                // Reference to the container
+                const tablesContainer = document.getElementById('tablesContainer');
+
                 // Loop through each collection name
                 for (const collectionName of collections) {
                     const userDataRef = doc(db, collectionName, username);
@@ -231,14 +277,14 @@
                         resultsData = resultsDataSnapshot.data();
                     }
 
-                    // Create and populate the data container
-                    const dataContainer = document.createElement('div');
-                    dataContainer.className = 'data-container';
+                    // Get matches data
+                    const matchesRef = doc(db, collectionName, "zapasy");
+                    const matchesSnapshot = await getDoc(matchesRef);
 
-                    const headerDiv = document.createElement('div');
-                    headerDiv.className = 'data-header';
-                    headerDiv.textContent = collectionName;
-                    dataContainer.appendChild(headerDiv);
+                    let matchesData = [];
+                    if (matchesSnapshot.exists()) {
+                        matchesData = matchesSnapshot.data().matches;
+                    }
 
                     let userValues = userData[Object.keys(userData)[0]]; // Assuming the key is always the same
 
@@ -261,33 +307,64 @@
                         }
                     }
 
-                    // Create divs and compare values only if resultsData exists
-                    userValues.forEach((value, index) => {
-                        const valueDiv = document.createElement('div');
-                        valueDiv.className = 'data-value';
+                    // Create the collection name div
+                    const collectionNameDiv = document.createElement('div');
+                    collectionNameDiv.className = 'collection-name';
+                    collectionNameDiv.textContent = collectionName;
+                    tablesContainer.appendChild(collectionNameDiv);
 
+                    // Create the table and apply styles
+                    const table = document.createElement('table');
+                    table.border = "1";
+                    table.style.width = 'auto';
+                    table.style.maxWidth = '100%';
+                    table.style.borderCollapse = 'collapse';
+                    table.style.margin = '20px auto';
+                    table.style.borderRadius = '10px';
+                    table.style.overflow = 'hidden';
+                    table.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                    table.style.tableLayout = 'auto';
+
+                    // Ensure both arrays have the same length for pairing
+                    const maxLength = Math.max(matchesData.length, userValues.length);
+
+                    // Loop through matches and user values to create rows
+                    for (let i = 0; i < maxLength; i++) {
+                        // Row for "Zápasy"
+                        const rowZápasy = document.createElement('tr');
+
+                        const matchCell = document.createElement('td');
+                        matchCell.textContent = matchesData[i] || ''; // Use empty string if no match data
+                        rowZápasy.appendChild(matchCell);
+                        table.appendChild(rowZápasy);
+
+                        // Row for "Tipy"
+                        const rowTipy = document.createElement('tr');
+
+                        const valueCell = document.createElement('td');
                         try {
-                            // Convert both values to lowercase for case-insensitive comparison
-                            const lowerCaseUserValue = value ? value.toLowerCase() : "";
-                            const lowerCaseResultValue = resultsData && resultValues[index] ? resultValues[index].toLowerCase() : "";
+                            const value = userValues[i] || ''; // Use empty string if no user value
+                            const lowerCaseUserValue = value.toLowerCase();
+                            const lowerCaseResultValue = resultsData && resultValues[i] ? resultValues[i].toLowerCase() : "";
 
                             if (resultsData && lowerCaseUserValue === lowerCaseResultValue) {
-                                valueDiv.style.backgroundColor = 'lightgreen'; // Set background to light green if values match
-                                valueDiv.style.color = '#167be8';
+                                valueCell.style.backgroundColor = 'lightgreen'; // Set background to light green if values match
+                                valueCell.style.color = '#167be8';
                             } else if (resultsData) {
-                                valueDiv.style.backgroundColor = 'lightcoral'; // Set background to light red if values don't match
-                                valueDiv.style.color = '#167be8';
+                                valueCell.style.backgroundColor = 'lightcoral'; // Set background to light red if values don't match
+                                valueCell.style.color = '#167be8';
                             }
 
-                            valueDiv.textContent = value;
-                            dataContainer.appendChild(valueDiv);
+                            valueCell.textContent = value;
                         } catch (error) {
                             console.error("Error processing values:", error);
                         }
-                    });
+                        rowTipy.appendChild(valueCell);
+                        table.appendChild(rowTipy);
+                    }
 
-                    // Append the data container to the tables container
-                    tablesContainer.appendChild(dataContainer);
+                    // Append the table to the tablesContainer
+                    tablesContainer.appendChild(table);
                 }
 
                 if (tablesContainer.children.length === 0) {
