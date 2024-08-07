@@ -377,7 +377,7 @@
             <p>V každém kole je potřeba vyplnit stejný nick, aby se body přičítaly</p>
             <p>Dále je potřeba <span style="color: lightcoral;">vyplnit heslo</span>. Při prvním přihlášení stačí vyplnit kolonku (čímkoliv, co si zamapatujete, číslo, písmeno, slovo, jméno... Je to jedno). Jedná se o ochranu, aby někdo cizí nemohl měnit Vaše tipy.<br>
                 <span style="color: lightcoral;">Heslo je potřeba si zapamatovat</span>! Při následujícím odesílání tipů nepůjde bez hesla tipy odeslat!</p>
-            <p>Nahoře je datum a čas uzávěrky, před tímto datem <span style="color: #f59a00;">lze tipy měnit</span>, po vypršení již nelze tipy ukládat!</p>
+            <p>Nahoře je datum a čas uzávěrky, před tímto datem lze tipy měnit, po vypršení již nelze tipy ukládat!</p>
             <p>Tipy na zápasy se budu snažit zveřejňovat co nejdříve</p>
             <p>Své tipy si můžete prohlížet kliknutím na <a style="color: #f59a00;" href="tips.html">Moje tipy</a> a následném přihlášení heslem</p>
             <p>V žebříčku bude vždy celkový součet bodů</p>
@@ -395,7 +395,7 @@
             <p><span style="color: lightcoral;">Při prvním odesílání</span> tipů <span style="color: lightcoral;">vyplňte heslo</span>, jaké chcete používat (číslo, písmeno, slovo, jméno...). Cokoliv, co si jednoduše <span style="color: lightcoral;">zapamatujete</span></p>
             <p>Při dalším odesílání tipů už bude potřeba <span style="color: lightcoral;">zadat prvně zadané heslo</span>, aby šlo tipy odeslat</p>
             <p>Heslo zároveň slouží ke zpřístupnění výpisu tipů</p>
-            <p>Pokud třeba <span style="color: #167be8;">heslo zapomenete</span> nebo ho chcete <span style="color: #167be8;">změnit</span>, pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
+            <p>Pokud třeba heslo zapomenete nebo ho chcete změnit, pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
             <p><span style="color: lightcoral;">Heslo zůstane</span> pro všechny budoucí tipovačky <span style="color: lightcoral;">stejné</span>, i když se budou bodové zisky nulovat</p>
             <p>Všechno je to jenom pro pobavení, nic vážného, takže přeji příjemnou zábavu 😁</p>
         </div>
@@ -552,7 +552,7 @@
                             pswd: enteredPassword
                         });
                         console.log("New password record created for:", name);
-                        rememberPswd = "\n\n❗Zapamatujte si heslo❗";
+                        rememberPswd = "\n\n❗Zapamatujte si heslo❗\n\n🙋 Nick: "+name+"\n🔒 Heslo: "+enteredPassword;
                     } catch (error) {
                         console.error('Error creating new password record: ', error);
                         alert('Chyba číslo 111: Chyba při vytváření nového hesla.'); // Error creating new password
