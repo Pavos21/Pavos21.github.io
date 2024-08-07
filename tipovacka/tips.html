@@ -109,7 +109,7 @@
         /* Style table rows */
         tr:nth-child(even) {
             background-color: #2e2e2e; /* Darker gray for even rows */
-            font-weight: bold;
+            /*font-weight: bold;*/
         }
 
         tr:nth-child(odd) {
@@ -181,11 +181,11 @@
     <div class="container">
         <form id="loginForm">
             <label for="username">Tipsport/Chance nick:</label>
-            <input type="text" id="username" name="username" required autocapitalize="off" maxlength="40">
+            <input type="text" id="username" name="username" required autocapitalize="off" maxlength="40" autocomplete="username">
             <label for="password">Heslo:</label>
-            <input type="password" id="password" name="password" required autocapitalize="off" maxlength="40">
+            <input type="password" id="password" name="password" required autocapitalize="off" maxlength="40" autocomplete="current-password">
             <input type="submit" value="Načíst"/>
-        </form>
+        </form>        
         <div class="spinner-container">
             <div id="spinner" class="spinner"></div>
         </div>
@@ -283,9 +283,11 @@
 
                     let matchesData = [];
                     let tipsData = [];
+                    let pointsData = [];
                     if (matchesSnapshot.exists()) {
                         matchesData = matchesSnapshot.data().matches;
                         tipsData = matchesSnapshot.data().tips;
+                        pointsData = matchesSnapshot.data().points;
                     }
 
                     let userValues = userData[Object.keys(userData)[0]]; // Assuming the key is always the same
@@ -357,7 +359,8 @@
                                 valueCell.style.color = '#167be8';
                             }
 
-                            valueCell.textContent = value;
+                            valueCell.innerHTML = `<span style="font-weight: bold;">${value}</span> (${pointsData[i]} b)`;
+
                         } catch (error) {
                             console.error("Error processing values:", error);
                         }
