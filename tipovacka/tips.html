@@ -282,8 +282,10 @@
                     const matchesSnapshot = await getDoc(matchesRef);
 
                     let matchesData = [];
+                    let tipsData = [];
                     if (matchesSnapshot.exists()) {
                         matchesData = matchesSnapshot.data().matches;
+                        tipsData = matchesSnapshot.data().tips;
                     }
 
                     let userValues = userData[Object.keys(userData)[0]]; // Assuming the key is always the same
@@ -334,7 +336,7 @@
                         const rowZápasy = document.createElement('tr');
 
                         const matchCell = document.createElement('td');
-                        matchCell.textContent = matchesData[i] || ''; // Use empty string if no match data
+                        matchCell.innerHTML = `${matchesData[i] || ''}<br><span style="color: #f59a00;">${tipsData[i] || ''}</span>`;
                         rowZápasy.appendChild(matchCell);
                         table.appendChild(rowZápasy);
 
