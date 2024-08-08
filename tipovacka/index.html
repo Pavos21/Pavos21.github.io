@@ -429,6 +429,18 @@
     </table>
 
     <script type="module">
+
+        // Function to prevent whitespace input
+        function preventWhitespace(event) {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
+        }
+
+        // Attach the event listener to both input fields
+        document.getElementById('name').addEventListener('keydown', preventWhitespace);
+        document.getElementById('pswd').addEventListener('keydown', preventWhitespace);
+
         // Your existing Firebase and form submission code...
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
