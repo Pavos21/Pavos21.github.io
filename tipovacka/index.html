@@ -430,16 +430,14 @@
 
     <script type="module">
 
-        // Function to prevent whitespace input
-        function preventWhitespace(event) {
-            if (event.key === ' ') {
-                event.preventDefault();
-            }
+        // Function to prevent and remove whitespace in real-time
+        function removeWhitespace(event) {
+            this.value = this.value.replace(/\s+/g, '');
         }
 
-        // Attach the event listener to both input fields
-        document.getElementById('name').addEventListener('keydown', preventWhitespace);
-        document.getElementById('pswd').addEventListener('keydown', preventWhitespace);
+        // Attach the event listener to both input fields for real-time whitespace removal
+        document.getElementById('name').addEventListener('input', removeWhitespace);
+        document.getElementById('pswd').addEventListener('input', removeWhitespace);
 
         // Your existing Firebase and form submission code...
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
