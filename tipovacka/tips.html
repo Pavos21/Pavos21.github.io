@@ -195,6 +195,18 @@
 
     <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
+
+        // Function to prevent whitespace input
+        function preventWhitespace(event) {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
+        }
+
+        // Attach the event listener to both input fields
+        document.getElementById('username').addEventListener('keydown', preventWhitespace);
+        document.getElementById('password').addEventListener('keydown', preventWhitespace);
+
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
