@@ -12,16 +12,27 @@
             font-family: 'Ubuntu', sans-serif;
             display: flex;
             justify-content: center;
+            align-items: center;
             margin: 0;
+            min-height: 100vh;
         }
 
-        .container {
+        .wrapper {
+            width: 100%;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
             width: 100%;
-            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding-top: 20px;
+            flex-grow: 1; /* This allows the container to take up all available space */
         }
 
         form {
@@ -94,38 +105,33 @@
             text-align: center;
         }
 
-        /* Ensure the table adjusts column widths based on content */
         table {
-            width: auto; /* Adjust width based on content */
-            max-width: 95%; /* Prevent table from exceeding container width */
-            border-collapse: collapse; /* Merge table borders */
-            margin: 20px auto; /* Center the table and add some margin */
-            border-radius: 10px; /* Rounded corners for the table */
-            overflow: hidden; /* Hide any overflow from rounded corners */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-            table-layout: auto; /* Automatically adjust column widths based on content */
+            width: auto; 
+            max-width: 95%; 
+            border-collapse: collapse; 
+            margin: 20px auto; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            table-layout: auto;
         }
 
-        /* Style table rows */
         tr:nth-child(even) {
-            background-color: #2e2e2e; /* Darker gray for even rows */
-            /*font-weight: bold;*/
+            background-color: #2e2e2e; 
         }
 
         tr:nth-child(odd) {
-            background-color: #454545; /* Light gray for odd rows */
+            background-color: #454545; 
         }
 
-        /* Style table cells */
         td {
-            padding: 10px; /* Padding inside cells */
-            border: 1px solid #ddd; /* Light border around cells */
-            text-align: center; /* Center text in cells */
-            white-space: normal; /* Allow text to wrap */
-            word-break: break-word; /* Break long words */
+            padding: 10px;
+            border: 1px solid #ddd; 
+            text-align: center; 
+            white-space: normal; 
+            word-break: break-word; 
         }
 
-        /* Style for the collection name div */
         .collection-name {
             background-color: #f59a00;
             color: white;
@@ -137,9 +143,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Spinner styles */
         .spinner {
-            display: none; /* Hidden by default */
+            display: none; 
             border: 8px solid rgba(255, 255, 255, 0.1);
             border-left: 8px solid #f59a00;
             border-radius: 50%;
@@ -159,7 +164,16 @@
             margin-top: 20px;
         }
 
-        /* Media query for phone layout */
+        .footer {
+            width: 90%;
+            margin: 20px auto 0 auto;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            word-wrap: break-word;
+        }
+
         @media (max-width: 600px) {
             .data-container {
                 flex-direction: column;
@@ -171,39 +185,50 @@
             }
 
             input[type="submit"]:hover {
-                background-color: #f59a00; /* Use the default color */
-                transition-duration: 0s; /* Remove the transition */
+                background-color: #f59a00;
+                transition-duration: 0s; 
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <form id="loginForm">
-            <label for="username">Tipsport/Chance nick:</label>
-            <input type="text" id="username" name="username" required autocapitalize="off" maxlength="40">
-            <label for="password">Heslo:</label>
-            <input type="text" id="password" name="password" required autocapitalize="off" maxlength="40">
-            <input type="submit" value="Načíst"/>
-        </form>        
-        <div class="spinner-container">
-            <div id="spinner" class="spinner"></div>
+    <div class="wrapper">
+        <div class="container">
+            <form id="loginForm">
+                <label for="username">Tipsport/Chance nick:</label>
+                <input type="text" id="username" name="username" required autocapitalize="off" maxlength="40">
+                <label for="password">Heslo:</label>
+                <input type="text" id="password" name="password" required autocapitalize="off" maxlength="40">
+                <input type="submit" value="Načíst"/>
+            </form>        
+            <div class="spinner-container">
+                <div id="spinner" class="spinner"></div>
+            </div>
+            <div id="tablesContainer"></div>
+            <br>
         </div>
-        <div id="tablesContainer"></div>
-        <br>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>Provoz stránky není nijak sponzorován. Jedná se o dobrovolný počin.<br>
+                Nelze si nárokovat žádné odměny.<br>
+                Stránka slouží pouze pro zábavu.</p>
+        </div>
     </div>
 
     <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
 
-        // Function to prevent and remove whitespace in real-time
-        function removeWhitespace(event) {
-            this.value = this.value.replace(/\s+/g, '');
+        // Function to prevent whitespace input
+        function preventWhitespace(event) {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
         }
 
-        // Attach the event listener to both input fields for real-time whitespace removal
-        document.getElementById('username').addEventListener('input', removeWhitespace);
-        document.getElementById('password').addEventListener('input', removeWhitespace);
+        // Attach the event listener to both input fields
+        document.getElementById('username').addEventListener('keydown', preventWhitespace);
+        document.getElementById('password').addEventListener('keydown', preventWhitespace);
 
         // Import Firebase libraries
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
