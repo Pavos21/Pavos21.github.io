@@ -306,6 +306,16 @@
             transition-duration: .3s;
         }
 
+        .footer {
+            width: 90%;
+            margin: 20px auto 0 auto;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            border-top: 1px solid #ccc;
+            word-wrap: break-word;
+        }
+
         
         @media (pointer: coarse) {
             .nickLabel {
@@ -428,16 +438,25 @@
         </tbody>
     </table>
 
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>Provoz stránky není nijak sponzorován. Jedná se o dobrovolný počin.<br>
+        Nelze si nárokovat žádné odměny.<br>
+        Stránka slouží pouze pro zábavu.</p>
+    </div>
+
     <script type="module">
 
-        // Function to prevent and remove whitespace in real-time
-        function removeWhitespace(event) {
-            this.value = this.value.replace(/\s+/g, '');
+        // Function to prevent whitespace input
+        function preventWhitespace(event) {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
         }
 
-        // Attach the event listener to both input fields for real-time whitespace removal
-        document.getElementById('name').addEventListener('input', removeWhitespace);
-        document.getElementById('pswd').addEventListener('input', removeWhitespace);
+        // Attach the event listener to both input fields
+        document.getElementById('name').addEventListener('keydown', preventWhitespace);
+        document.getElementById('pswd').addEventListener('keydown', preventWhitespace);
 
         // Your existing Firebase and form submission code...
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
