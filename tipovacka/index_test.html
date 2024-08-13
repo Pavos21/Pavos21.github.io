@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Neoficiální Tipovačka</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #167be8;
+            color: white;
+            font-family: 'Ubuntu';
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .deadline {
+            text-align: center;
+            color: #f59a00;
+        }
+        /* Style for the form element */
+        #dataForm {
+            display: flex; /* Use flexbox for alignment */
+            flex-direction: column; /* Arrange children in a column */
+            align-items: center; /* Center items horizontally */
+            margin: 0 auto; /* Center the form horizontally if needed */
+            max-width: 600px; /* Optional: Set a max-width for better layout */
+            padding: 20px; /* Optional: Add padding inside the form */
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        .nickLabel {
+            font-size: 1.2em;
+        }
+
+        /* Style for the input field */
+        .nickInput {
+            padding: 5px; /* Add padding inside the input field */
+            width: 100%; /* Make input field take up full width of its container */
+            max-width: 300px; /* Optional: Limit the maximum width of the input field */
+            border: 1px solid #ccc; /* Add border to the input field */
+            border-radius: 5px; /* Optional: Rounded corners for the input field */
+            text-align: center;
+        }
+
+        /* Style for the submit button */
+        input[type="submit"] {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 20vw;
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        #dynamicInputFields {
+            margin: 20px auto;
+            padding: 10px;
+            width: fit-content;
+            max-width: 100%;
+            border: 1px solid white;
+            border-radius: 15px;
+            background-color: #454545;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .dynamic-label {
+            display: block;
+        }
+        .dynamic-text {
+            display: block;
+            color: #f59a00;
+        }
+        .dynamic-points {
+            display: block;
+            color: white;
+        }
+        .dynamic-input {
+            text-align: center;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Ensure the table adjusts column widths based on content */
+        table {
+            width: auto; /* Adjust width based on content */
+            max-width: 100%; /* Prevent table from exceeding container width */
+            border-collapse: collapse; /* Merge table borders */
+            margin: 20px auto; /* Center the table and add some margin */
+            border-radius: 10px; /* Rounded corners for the table */
+            overflow: hidden; /* Hide any overflow from rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            table-layout: auto; /* Automatically adjust column widths based on content */
+        }
+
+        /* Style table headers */
+        th {
+            background-color: #f59a00; /* Green background for header */
+            color: white; /* White text color */
+            padding: 10px; /* Padding inside header cells */
+            text-align: center; /* Center text */
+            font-weight: normal;
+        }
+
+        /* Style table rows */
+        tr:nth-child(even) {
+            background-color: #2e2e2e; /* Darker gray for even rows */
+        }
+
+        tr:nth-child(odd) {
+            background-color: #454545; /* Light gray for odd rows */
+        }
+
+        /* Style table cells */
+        td {
+            padding: 10px; /* Padding inside cells */
+            border: 1px solid #ddd; /* Light border around cells */
+            text-align: center; /* Center text in cells */
+            white-space: nowrap; /* Prevent wrapping within cells */
+        }
+
+        #buttonContainer {
+            text-align: center; /* Center the container */
+        }
+
+        #openPopupBtn {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Initial button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 10vw; /* Button width relative to viewport width */
+            text-align: center; /* Center text inside button */
+            display: inline-block; /* Make button an inline-block element */
+            margin: 0 10px; /* Add some horizontal margin between buttons */
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+            /*animation: blink 0.5s infinite; /* Apply the blink animation */
+        }
+
+        @keyframes blink {
+            0% {
+                background-color: #f59a00; /* Initial color */
+            }
+            50% {
+                background-color: #ff4000; /* Blink to this color */
+            }
+            100% {
+                background-color: #f59a00; /* Back to initial color */
+            }
+        }
+
+        #openPopupBtn:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        .popup {
+            display: none; /* Hide popup by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1000; /* Ensure popup is on top */
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #454545;
+            padding: 20px;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 60vw;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        /* */
+        #whyBtn {
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Initial button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 10vw; /* Button width relative to viewport width */
+            text-align: center; /* Center text inside button */
+            display: inline-block; /* Make button an inline-block element */
+            margin: 0 10px; /* Add some horizontal margin between buttons */
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+            animation: blink 0.5s infinite; /* Apply the blink animation */
+        }
+
+        #whyBtn:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        .whyPop {
+            display: none; /* Hide popup by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1000; /* Ensure popup is on top */
+        }
+
+        .why-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #454545;
+            padding: 20px;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 60vw;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+        }
+
+        .close-why {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        /**/
+
+
+        .button-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            gap: 10px; /* Adjust the gap between buttons as needed */
+            flex-wrap: wrap; /* Allow wrapping to the next line if needed */
+        }
+
+        .dynamic-radio-input {
+            display: none; /* Hide the actual radio buttons */
+        }
+
+        .dynamic-radio-label {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: black;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dynamic-radio-label:hover {
+            background-color: #e0e0e0;
+        }
+
+        .dynamic-radio-input:checked + .dynamic-radio-label {
+            background-color: #167be8;
+            color: white;
+            border-color: #167be8;
+        }
+
+        #myTips {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px; /* Add padding inside the button */
+            background-color: #f59a00; /* Button background color */
+            color: white; /* Button text color */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            width: 20vw;
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+        }
+
+        #myTips:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        .footer {
+            width: 90%;
+            margin: 20px auto 0 auto;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            border-top: 1px solid #ccc;
+            word-wrap: break-word;
+        }
+
+        
+        @media (pointer: coarse) {
+            .nickLabel {
+                font-size: 1.2em;
+            }
+
+            .nickInput {
+                padding: 5px; /* Add padding inside the input field */
+                width: 100%; /* Make input field take up full width of its container */
+                max-width: 80%; /* Optional: Limit the maximum width of the input field */
+                border: 1px solid #ccc; /* Add border to the input field */
+                border-radius: 5px; /* Optional: Rounded corners for the input field */
+                text-align: center;
+            }
+
+            input[type="submit"] {
+                width: 35vw;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #f59a00;
+                transition-duration: 0s;
+            }
+
+            #myTips {
+                width: 35vw;
+            }
+
+            #myTips:hover {
+                background-color: #f59a00;
+                transition-duration: 0s;
+            }
+
+            #openPopupBtn, #whyBtn {
+                width: 30vw; /* Button width relative to viewport width */
+            }
+
+            #openPopupBtn:hover, #whyBtn:hover {
+                background-color: #f59a00;
+                transition-duration: 0s;
+            }
+
+            .popup-content, .why-content {
+                font-size: 14px;
+                max-width: 85vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>National Bank Open presented by Rogers</h1>
+
+    <h2 id="roundText" class="roundText"></h2>
+
+    <h2 id="deadline" class="deadline"></h2>
+
+    <div id="buttonContainer">
+        <button id="openPopupBtn">Jak tipovat?</button>
+        <button id="whyBtn">Proč heslo?</button>
+    </div>
+    
+
+    <!-- Popup container -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <h3>Jak tipovat? 🤔</h3>
+            <p>V první řadě je třeba <span style="color: lightcoral;">vyplnit herní nick</span>. Je nutné ho napsat bez chyb, jelikož se při prvním odeslání vytvoří záznam pro body</p>
+            <p>V každém kole je potřeba vyplnit stejný nick, aby se body přičítaly</p>
+            <p>Dále je potřeba <span style="color: lightcoral;">vyplnit heslo</span>. Při prvním přihlášení stačí vyplnit kolonku (čímkoliv, co si zamapatujete, číslo, písmeno, slovo, jméno... Je to jedno). Jedná se o ochranu, aby někdo cizí nemohl měnit Vaše tipy.<br>
+                <span style="color: lightcoral;">Heslo je potřeba si zapamatovat</span>! Při následujícím odesílání tipů nepůjde bez hesla tipy odeslat!</p>
+            <p>Nahoře je datum a čas uzávěrky, před tímto datem lze tipy měnit, po vypršení již nelze tipy ukládat!</p>
+            <p>Tipy na zápasy se budu snažit zveřejňovat co nejdříve</p>
+            <p>Své tipy si můžete prohlížet kliknutím na <a style="color: #f59a00;" href="tips.html">Moje tipy</a> a následném přihlášení heslem</p>
+            <p>V žebříčku bude vždy celkový součet bodů</p>
+            <p>Pokud se cokoliv stane (chybný nick, zapomenuté heslo atd.), pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
+            <p>Všechno je to jenom pro pobavení, nic vážného, takže přeji příjemnou zábavu 😁</p>
+        </div>
+    </div>
+
+    <!-- Why container -->
+    <div id="whyPop" class="whyPop">
+        <div class="why-content">
+            <span class="close-why">&times;</span>
+            <h3>Proč heslo? 🕵️</h3>
+            <p>Heslo je kvůli tomu, aby ostatní nemohli měnit tipy zadáním cizího nicku</p>
+            <p><span style="color: lightcoral;">Při prvním odesílání</span> tipů <span style="color: lightcoral;">vyplňte heslo</span>, jaké chcete používat (číslo, písmeno, slovo, jméno...). Cokoliv, co si jednoduše <span style="color: lightcoral;">zapamatujete</span></p>
+            <p>Při dalším odesílání tipů už bude potřeba <span style="color: lightcoral;">zadat prvně zadané heslo</span>, aby šlo tipy odeslat</p>
+            <p>Heslo zároveň slouží ke zpřístupnění výpisu tipů</p>
+            <p>Pokud třeba <span style="color: #167be8;">heslo zapomenete</span> nebo ho chcete <span style="color: #167be8;">změnit</span>, pište mi na Tipsportu do SZ (<a style="color: #167be8;" href="https://www.tipsport.cz/verejny-profil/mIYij8wsuBUCoFDs3KTxrQ" target="_blank">Pavel14403</a>), nějak to vyřešíme 😉</p>
+            <p><span style="color: lightcoral;">Heslo zůstane</span> pro všechny budoucí tipovačky <span style="color: lightcoral;">stejné</span>, i když se budou bodové zisky nulovat</p>
+            <p>Všechno je to jenom pro pobavení, nic vážného, takže přeji příjemnou zábavu 😁</p>
+        </div>
+    </div>
+
+    <!-- Form to submit user data -->
+    <form id="dataForm">
+        <label class="nickLabel" for="name">Tipsport/Chance nick:</label><br>
+        <input class="nickInput" type="text" id="name" name="name" required maxlength="40" autocapitalize="off"><br>
+        <label class="nickLabel" for="pswd">Heslo:</label><br>
+        <input class="nickInput" type="text" id="pswd" name="pswd" required maxlength="40" autocapitalize="off">
+        <div id="dynamicInputFields"></div>
+        <input type="submit" value="Odeslat">
+    </form>
+
+    <br><br>
+    <button id="myTips" onclick="window.location.href='tips.html'">Moje tipy</button>
+
+    <h1>Žebříček</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Pořadí</th>
+                <th>Nick</th>
+                <th>Body celkem</th>
+            </tr>
+        </thead>
+        <tbody id="users-table-body">
+            <!-- Dynamic content will be inserted here -->
+        </tbody>
+    </table>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>Provoz stránky není nijak sponzorován. Jedná se o dobrovolný počin.<br>
+        Nelze si nárokovat žádné odměny.<br>
+        Stránka slouží pouze pro zábavu.</p>
+    </div>
+
+    <script type="module">
+        // Function to load Firebase config from a text file
+        async function loadFirebaseConfig() {
+            const response = await fetch('config.txt');
+            const text = await response.text();
+            const config = {};
+    
+            // Parse the text file line by line
+            text.split('\n').forEach(line => {
+                const [key, value] = line.split('=');
+                if (key && value) {
+                    config[key.trim()] = value.trim();
+                }
+            });
+    
+            return config;
+        }
+    
+        // Function to initialize Firebase with the loaded config
+        async function initializeFirebase() {
+            const firebaseConfig = await loadFirebaseConfig();
+    
+            // Import Firebase modules
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+            const { getAnalytics } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js');
+            const { getFirestore, doc, getDoc, setDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const db = getFirestore(app);
+    
+            function formatTimestamp(timestamp) {
+                const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+                return date.toLocaleString();
+            }
+    
+            document.getElementById('dataForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+    
+                const numMatches = document.querySelectorAll('.button-container').length;
+                const tips = [];
+                for (let i = 0; i < numMatches; i++) {
+                    const selectedRadio = document.querySelector(`input[name="tip${i}"]:checked`);
+                    if (selectedRadio) {
+                        tips.push(selectedRadio.value);
+                    } else {
+                        alert(`Prosím vyberte tip pro ${i + 1}. zápas`);
+                        return;
+                    }
+                }
+    
+                let currentRound;
+                try {
+                    const roundDocRef = doc(db, 'active', 'round');
+                    const roundDocSnap = await getDoc(roundDocRef);
+    
+                    if (roundDocSnap.exists()) {
+                        const roundData = roundDocSnap.data();
+                        currentRound = roundData.active;
+    
+                        if (!currentRound) {
+                            alert('Chyba číslo 100');
+                            return;
+                        }
+                    } else {
+                        alert('Chyba číslo 101');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error getting current round: ', error);
+                    alert('Chyba číslo 102');
+                    return;
+                }
+    
+                try {
+                    const zapasyDocRef = doc(db, currentRound, 'zapasy');
+                    const zapasyDocSnap = await getDoc(zapasyDocRef);
+    
+                    if (zapasyDocSnap.exists()) {
+                        const data = zapasyDocSnap.data();
+                        const timestamp = data.time;
+    
+                        if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+                            const currentTime = new Date();
+                            const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+    
+                            if (currentTime > deadlineTime) {
+                                alert("❗Tipování je uzavřeno. Nelze odeslat tipy po uzávěrce❗");
+                                return;
+                            }
+                        } else {
+                            console.error("Timestamp field is not a valid Firestore Timestamp object.");
+                            alert("Error: Invalid timestamp in database.");
+                            return;
+                        }
+                    } else {
+                        console.log("No such document with ID 'zapasy'!");
+                        alert("Error: No match data found for today.");
+                        return;
+                    }
+                } catch (error) {
+                    console.error("Error getting document: ", error);
+                    alert("Error checking deadline.");
+                    return;
+                }
+    
+                const name = document.getElementById('name').value;
+                const enteredPassword = document.getElementById('pswd').value;
+    
+                let storedPassword;
+                let rememberPswd = "";
+                try {
+                    const pswdDocRef = doc(db, 'passwords', name);
+                    const pswdDocSnap = await getDoc(pswdDocRef);
+    
+                    if (pswdDocSnap.exists()) {
+                        const pswdData = pswdDocSnap.data();
+                        storedPassword = pswdData.pswd;
+    
+                        if (enteredPassword !== storedPassword) {
+                            alert("❌Nesprávné heslo.❌");
+                            return;
+                        }
+                    } else {
+                        try {
+                            await setDoc(pswdDocRef, {
+                                pswd: enteredPassword
+                            });
+                            console.log("New password record created for:", name);
+                            rememberPswd = "\n\n❗Zapamatujte si heslo❗\n\n🙋 Nick: "+name+"\n🔒 Heslo: "+enteredPassword;
+                        } catch (error) {
+                            console.error('Error creating new password record: ', error);
+                            alert('Chyba číslo 111: Chyba při vytváření nového hesla.');
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error getting password: ', error);
+                    alert('Chyba číslo 110: Chyba při kontrole hesla.');
+                    return;
+                }
+    
+                try {
+                    const pointsDocRef = doc(db, 'points', name);
+                    const pointsDocSnap = await getDoc(pointsDocRef);
+    
+                    if (!pointsDocSnap.exists()) {
+                        await setDoc(pointsDocRef, {
+                            points: 0
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert("Chyba číslo 106");
+                    return;
+                }
+    
+                try {
+                    const userDocRef = doc(db, currentRound, name);
+    
+                    await setDoc(userDocRef, {
+                        tips: tips
+                    });
+                    console.log("Document written with ID: ", name);
+                    alert("Úspěšně odesláno ✅"+rememberPswd);
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert("Nepovedlo se odeslat\nChyba číslo 107");
+                }
+            });
+    
+            async function populateMatchData() {
+                const dynamicInputFieldsDiv = document.getElementById('dynamicInputFields');
+                dynamicInputFieldsDiv.innerHTML = '';
+    
+                try {
+                    const roundDocRef = doc(db, 'active', 'round');
+                    const roundDocSnap = await getDoc(roundDocRef);
+    
+                    if (roundDocSnap.exists()) {
+                        const roundData = roundDocSnap.data();
+                        const currentRound = roundData.active;
+    
+                        if (currentRound) {
+                            document.getElementById('roundText').innerText = currentRound;
+                            const zapasyDocRef = doc(db, currentRound, 'zapasy');
+                            const zapasyDocSnap = await getDoc(zapasyDocRef);
+    
+                            if (zapasyDocSnap.exists()) {
+                                const data = zapasyDocSnap.data();
+                                const tips = data.tips;
+                                const matches = data.matches;
+                                const points = data.points;
+                                const timestamp = data.time;
+                                const buttons = data.buttons;
+    
+                                if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+                                    const currentTime = new Date();
+                                    const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+                                    const deadlineElement = document.getElementById('deadline');
+    
+                                    if (currentTime > deadlineTime) {
+                                        deadlineElement.style.color = "red";
+                                        deadlineElement.textContent = "Je po uzávěrce";
+                                    } else {
+                                        deadlineElement.textContent = `Uzávěrka: ${formatTimestamp(timestamp)}`;
+                                    }
+                                } else {
+                                    console.error("Timestamp field is not a valid Firestore Timestamp object.");
+                                    alert("Error: Invalid timestamp in database.");
+                                }
+    
+                                if (tips && matches && tips.length === matches.length) {
+                                    for (let i = 0; i < tips.length; i++) {
+                                        const tipLabel = document.createElement('label');
+                                        tipLabel.textContent = `Zápas: ${matches[i]}`;
+                                        tipLabel.classList.add('dynamic-label');
+    
+                                        const tipText = document.createElement('span');
+                                        tipText.textContent = `Tipovat: ${tips[i]}`;
+                                        tipText.classList.add('dynamic-text');
+    
+                                        const pointsText = document.createElement('span');
+                                        pointsText.textContent = `Body: ${points[i]}`;
+                                        pointsText.classList.add('dynamic-points');
+    
+                                        dynamicInputFieldsDiv.appendChild(tipLabel);
+                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                        dynamicInputFieldsDiv.appendChild(tipText);
+                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                        dynamicInputFieldsDiv.appendChild(pointsText);
+                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+    
+                                        if (buttons && buttons[i]) {
+                                            const options = buttons[i].split(';');
+                                            const buttonContainer = document.createElement('div');
+                                            buttonContainer.classList.add('button-container');
+    
+                                            options.forEach((option, index) => {
+                                                const radioInput = document.createElement('input');
+                                                const radioId = `tip${i}_${index}`;
+                                                radioInput.type = 'radio';
+                                                radioInput.name = `tip${i}`;
+                                                radioInput.value = option;
+                                                radioInput.id = radioId;
+                                                radioInput.classList.add('dynamic-radio-input');
+    
+                                                const radioLabel = document.createElement('label');
+                                                radioLabel.textContent = option;
+                                                radioLabel.setAttribute('for', radioId);
+                                                radioLabel.classList.add('dynamic-radio-label');
+    
+                                                buttonContainer.appendChild(radioInput);
+                                                buttonContainer.appendChild(radioLabel);
+                                            });
+    
+                                            dynamicInputFieldsDiv.appendChild(buttonContainer);
+                                        }
+    
+                                        dynamicInputFieldsDiv.appendChild(document.createElement('hr'));
+                                    }
+                                } else {
+                                    console.log("Data for tips and matches do not match or are missing.");
+                                    alert("Error: Mismatch or missing data for tips and matches.");
+                                }
+                            } else {
+                                console.log("No such document!");
+                                alert("Error: No match data found for the current round.");
+                            }
+                        } else {
+                            alert("Chyba číslo 103");
+                        }
+                    } else {
+                        alert("Chyba číslo 104");
+                    }
+                } catch (error) {
+                    console.error("Error getting document: ", error);
+                    alert("Chyba číslo 105");
+                }
+    
+                try {
+                    const pointsCollection = collection(db, "points");
+                    const pointsSnapshot = await getDocs(pointsCollection);
+                    let usersList = [];
+    
+                    pointsSnapshot.forEach(doc => {
+                        const username = doc.id;
+                        const points = doc.data().points || 0;
+                        usersList.push({ name: username, points: points });
+                    });
+    
+                    usersList.sort((a, b) => b.points - a.points);
+    
+                    const tableBody = document.getElementById("users-table-body");
+                    let previousPoints = null;
+                    let previousNumber = 1;
+    
+                    usersList.forEach((user, index) => {
+                        const row = document.createElement("tr");
+    
+                        let rowNumber;
+                        if (previousPoints !== null && user.points === previousPoints) {
+                            rowNumber = previousNumber;
+                        } else {
+                            rowNumber = previousNumber = index + 1;
+                            previousPoints = user.points;
+                        }
+    
+                        const rowNumberCell = document.createElement("td");
+                        rowNumberCell.textContent = `${rowNumber}.`;
+                        row.appendChild(rowNumberCell);
+    
+                        const nameCell = document.createElement("td");
+                        nameCell.textContent = user.name;
+                        row.appendChild(nameCell);
+    
+                        const pointsCell = document.createElement("td");
+                        pointsCell.style.textAlign = "center";
+                        pointsCell.textContent = user.points;
+                        row.appendChild(pointsCell);
+    
+                        tableBody.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error("Error fetching points: ", error);
+                    alert("Chyba při načítání bodů.");
+                }
+            }
+    
+            document.addEventListener('DOMContentLoaded', async function() {
+                await initializeFirebase();
+    
+                // Popup functionality
+                const openPopupBtn = document.getElementById('openPopupBtn');
+                const popup = document.getElementById('popup');
+                const closeBtn = document.querySelector('.close-btn');
+    
+                openPopupBtn.addEventListener('click', function() {
+                    popup.style.display = 'block';
+                });
+    
+                closeBtn.addEventListener('click', function() {
+                    popup.style.display = 'none';
+                });
+    
+                window.addEventListener('click', function(event) {
+                    if (event.target === popup) {
+                        popup.style.display = 'none';
+                    }
+                });
+    
+                const openWhy = document.getElementById('whyBtn');
+                const why = document.getElementById('whyPop');
+                const closeWhy = document.querySelector('.close-why');
+    
+                openWhy.addEventListener('click', function() {
+                    why.style.display = 'block';
+                });
+    
+                closeWhy.addEventListener('click', function() {
+                    why.style.display = 'none';
+                });
+    
+                window.addEventListener('click', function(event) {
+                    if (event.target === why) {
+                        why.style.display = 'none';
+                    }
+                });
+            });
+        }
+    </script>    
+</body>
+</html>
