@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Neoficiální Tipovačka</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
+    <style>
+        body {
+            background-color: #167be8;
+            color: white;
+            font-family: 'Ubuntu', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            flex-grow: 1; /* This allows the container to take up all available space */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #username, #password {
+            padding: 5px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #f59a00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 20vw;
+            box-shadow: 3px 3px 5px 0px rgba(50,50,50,0.75);
+            transition-duration: .3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #b17000;
+            transition-duration: .3s;
+        }
+
+        label, input, button {
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .data-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .data-value {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .data-header {
+            flex-basis: 100%;
+            background-color: #f59a00;
+            color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        table {
+            width: auto; 
+            max-width: 95%; 
+            border-collapse: collapse; 
+            margin: 20px auto; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            table-layout: auto;
+        }
+
+        tr:nth-child(even) {
+            background-color: #2e2e2e; 
+        }
+
+        tr:nth-child(odd) {
+            background-color: #454545; 
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #ddd; 
+            text-align: center; 
+            white-space: normal; 
+            word-break: break-word; 
+        }
+
+        .collection-name {
+            background-color: #f59a00;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px auto;
+            max-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .spinner {
+            display: none; 
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-left: 8px solid #f59a00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .footer {
+            width: 90%;
+            margin: 20px auto 0 auto;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            word-wrap: break-word;
+        }
+
+        @media (max-width: 600px) {
+            .data-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .data-header {
+                width: 100%;
+            }
+
+            input[type="submit"]:hover {
+                background-color: #f59a00;
+                transition-duration: 0s; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <form id="loginForm">
+                <label for="username">Tipsport/Chance nick:</label>
+                <input type="text" id="username" name="username" required autocapitalize="off" maxlength="40">
+                <label for="password">Heslo:</label>
+                <input type="text" id="password" name="password" required autocapitalize="off" maxlength="40">
+                <input type="submit" value="Načíst"/>
+            </form>        
+            <div class="spinner-container">
+                <div id="spinner" class="spinner"></div>
+            </div>
+            <div id="tablesContainer"></div>
+            <br>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>Provoz stránky není nijak sponzorován. Jedná se o dobrovolný počin.<br>
+                Nelze si nárokovat žádné odměny.<br>
+                Stránka slouží pouze pro zábavu.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Function to prevent whitespace input
+        function preventWhitespace(event) {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
+        }
+
+        // Attach the event listener to both input fields
+        document.getElementById('username').addEventListener('keydown', preventWhitespace);
+        document.getElementById('password').addEventListener('keydown', preventWhitespace);
+
+        // Function to load the Firebase configuration from config.txt
+        async function loadConfig() {
+            const response = await fetch('config.txt');
+            const text = await response.text();
+            const config = {};
+            
+            // Parse the text line by line
+            text.split('\n').forEach(line => {
+                const [key, value] = line.split('=');
+                config[key.trim()] = value.trim();
+            });
+            
+            return config;
+        }
+
+        // Initialize Firebase after loading configuration
+        loadConfig().then(config => {
+            // Import Firebase libraries dynamically
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
+                import('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js').then(({ getAnalytics }) => {
+                    import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, doc, getDoc }) => {
+
+                        // Initialize Firebase with loaded configuration
+                        const app = initializeApp(config);
+                        const analytics = getAnalytics(app);
+                        const db = getFirestore(app);
+
+                        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+                            event.preventDefault();
+
+                            const username = document.getElementById('username').value;
+                            const password = document.getElementById('password').value;
+                            const submitButton = event.target.querySelector('input[type="submit"]');
+                            const spinner = document.getElementById('spinner');
+                            const tablesContainer = document.getElementById('tablesContainer');
+
+                            // Show spinner and disable button
+                            submitButton.disabled = true;
+                            spinner.style.display = 'block';
+
+                            tablesContainer.innerHTML = ''; // Clear previous tables
+
+                            try {
+                                // Fetch password for the user
+                                const pswdDocRef = doc(db, 'passwords', username);
+                                const pswdDocSnap = await getDoc(pswdDocRef);
+
+                                if (!pswdDocSnap.exists()) {
+                                    alert('Tento nick neexistuje nebo ještě nemá heslo');
+                                    return;
+                                }
+
+                                const storedPassword = pswdDocSnap.data().pswd;
+                                if (password !== storedPassword) {
+                                    alert('❌Špatné heslo❌');
+                                    return;
+                                }
+
+                                // Function to generate collection names dynamically from "14.kolo" to "1.kolo"
+                                const collections = [];
+                                for (let i = 14; i >= 1; i--) {
+                                    collections.push(`${i}.kolo`);
+                                }
+
+                                // Reference to the container
+                                const tablesContainer = document.getElementById('tablesContainer');
+
+                                // Loop through each collection name
+                                for (const collectionName of collections) {
+                                    const userDataRef = doc(db, collectionName, username);
+                                    const userDataSnapshot = await getDoc(userDataRef);
+
+                                    if (!userDataSnapshot.exists()) {
+                                        // Skip if no data found for this collection
+                                        continue;
+                                    }
+
+                                    const userData = userDataSnapshot.data();
+
+                                    // Get results data
+                                    const resultsRef = doc(db, collectionName, "results");
+                                    const resultsDataSnapshot = await getDoc(resultsRef);
+
+                                    let resultsData = null;
+                                    if (resultsDataSnapshot.exists()) {
+                                        resultsData = resultsDataSnapshot.data();
+                                    }
+
+                                    // Get matches data
+                                    const matchesRef = doc(db, collectionName, "zapasy");
+                                    const matchesSnapshot = await getDoc(matchesRef);
+
+                                    let matchesData = [];
+                                    let tipsData = [];
+                                    let pointsData = [];
+                                    if (matchesSnapshot.exists()) {
+                                        matchesData = matchesSnapshot.data().matches;
+                                        tipsData = matchesSnapshot.data().tips;
+                                        pointsData = matchesSnapshot.data().points;
+                                    }
+
+                                    let userValues = userData[Object.keys(userData)[0]]; // Assuming the key is always the same
+
+                                    // Ensure userValues is an array
+                                    if (typeof userValues === 'string') {
+                                        userValues = userValues.split(',').map(value => value.trim()); // Split comma-separated values and trim spaces
+                                    } else if (!Array.isArray(userValues)) {
+                                        userValues = [userValues]; // Ensure userValues is an array
+                                    }
+
+                                    let resultValues = [];
+                                    if (resultsData) {
+                                        resultValues = resultsData[Object.keys(resultsData)[0]]; // Assuming the key is always the same
+
+                                        // Ensure resultValues is an array
+                                        if (typeof resultValues === 'string') {
+                                            resultValues = resultValues.split(',').map(value => value.trim()); // Split comma-separated values and trim spaces
+                                        } else if (!Array.isArray(resultValues)) {
+                                            resultValues = [resultValues]; // Ensure resultValues is an array
+                                        }
+                                    }
+
+                                    // Create the collection name div
+                                    const collectionNameDiv = document.createElement('div');
+                                    collectionNameDiv.className = 'collection-name';
+                                    collectionNameDiv.textContent = collectionName;
+                                    tablesContainer.appendChild(collectionNameDiv);
+
+                                    // Create the table and apply styles
+                                    const table = document.createElement('table');
+                                    table.border = "1";
+                                    table.style.width = 'auto';
+                                    table.style.maxWidth = '100%';
+                                    table.style.borderCollapse = 'collapse';
+                                    table.style.margin = '20px auto';
+                                    table.style.borderRadius = '10px';
+                                    table.style.overflow = 'hidden';
+                                    table.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                                    table.style.tableLayout = 'auto';
+
+                                    // Ensure both arrays have the same length for pairing
+                                    const maxLength = Math.max(matchesData.length, userValues.length);
+
+                                    // Loop through matches and user values to create rows
+                                    for (let i = 0; i < maxLength; i++) {
+                                        // Row for "Zápasy"
+                                        const rowZápasy = document.createElement('tr');
+
+                                        const matchCell = document.createElement('td');
+                                        matchCell.innerHTML = `${matchesData[i] || ''}<br><span style="color: #f59a00;">${tipsData[i] || ''}</span>`;
+                                        rowZápasy.appendChild(matchCell);
+                                        table.appendChild(rowZápasy);
+
+                                        // Row for "Tipy"
+                                        const rowTipy = document.createElement('tr');
+
+                                        const valueCell = document.createElement('td');
+                                        try {
+                                            const value = userValues[i] || ''; // Use empty string if no user value
+                                            const lowerCaseUserValue = value.toLowerCase();
+                                            const lowerCaseResultValue = resultsData && resultValues[i] ? resultValues[i].toLowerCase() : "";
+
+                                            if (resultsData && lowerCaseUserValue === lowerCaseResultValue) {
+                                                valueCell.style.backgroundColor = 'lightgreen'; // Set background to light green if values match
+                                                valueCell.style.color = '#167be8';
+                                            } else if (resultsData) {
+                                                valueCell.style.backgroundColor = 'lightcoral'; // Set background to light red if values don't match
+                                                valueCell.style.color = '#167be8';
+                                            }
+
+                                            valueCell.innerHTML = `<span style="font-weight: bold;">${value}</span> (${pointsData[i]} b)`;
+
+                                        } catch (error) {
+                                            console.error("Error processing values:", error);
+                                        }
+                                        rowTipy.appendChild(valueCell);
+                                        table.appendChild(rowTipy);
+                                    }
+
+                                    // Append the table to the tablesContainer
+                                    tablesContainer.appendChild(table);
+                                }
+
+                                if (tablesContainer.children.length === 0) {
+                                    alert('No data found for user in the available collections.');
+                                }
+                            } catch (error) {
+                                alert('An error occurred: ' + error.message);
+                            } finally {
+                                // Hide spinner and enable button
+                                submitButton.disabled = false;
+                                submitButton.value = 'Načíst';
+                                spinner.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            });
+        }).catch(error => {
+            console.error("Error loading Firebase config:", error);
+            alert('Chyba číslo 216, nelze načíst data');
+        });
+    </script>
+</body>
+</html>
