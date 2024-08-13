@@ -446,376 +446,217 @@
     </div>
 
     <script type="module">
-        // Function to load Firebase config from a text file
-        async function loadFirebaseConfig() {
+        // Function to prevent whitespace input
+        function preventWhitespace(event) {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
+        }
+    
+        // Attach the event listener to both input fields
+        document.getElementById('username').addEventListener('keydown', preventWhitespace);
+        document.getElementById('password').addEventListener('keydown', preventWhitespace);
+    
+        // Function to load the Firebase configuration from config.txt
+        async function loadConfig() {
             const response = await fetch('config.txt');
             const text = await response.text();
             const config = {};
     
-            // Parse the text file line by line
+            // Parse the text line by line
             text.split('\n').forEach(line => {
                 const [key, value] = line.split('=');
-                if (key && value) {
-                    config[key.trim()] = value.trim();
-                }
+                config[key.trim()] = value.trim();
             });
     
             return config;
         }
     
-        // Function to initialize Firebase with the loaded config
-        async function initializeFirebase() {
-            const firebaseConfig = await loadFirebaseConfig();
+        // Initialize Firebase after loading configuration
+        loadConfig().then(config => {
+            // Import Firebase libraries dynamically
+            import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js').then(({ initializeApp }) => {
+                import('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js').then(({ getAnalytics }) => {
+                    import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(({ getFirestore, doc, getDoc, setDoc, collection, getDocs }) => {
     
-            // Import Firebase modules
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-            const { getAnalytics } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js');
-            const { getFirestore, doc, getDoc, setDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+                        // Initialize Firebase with loaded configuration
+                        const app = initializeApp(config);
+                        const analytics = getAnalytics(app);
+                        const db = getFirestore(app);
     
-            // Initialize Firebase
-            const app = initializeApp(firebaseConfig);
-            const analytics = getAnalytics(app);
-            const db = getFirestore(app);
+                        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+                            event.preventDefault();
     
-            function formatTimestamp(timestamp) {
-                const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
-                return date.toLocaleString();
-            }
+                            const username = document.getElementById('username').value;
+                            const password = document.getElementById('password').value;
+                            const submitButton = event.target.querySelector('input[type="submit"]');
+                            const spinner = document.getElementById('spinner');
+                            const tablesContainer = document.getElementById('tablesContainer');
     
-            document.getElementById('dataForm').addEventListener('submit', async function(event) {
-                event.preventDefault();
+                            // Show spinner and disable button
+                            submitButton.disabled = true;
+                            spinner.style.display = 'block';
     
-                const numMatches = document.querySelectorAll('.button-container').length;
-                const tips = [];
-                for (let i = 0; i < numMatches; i++) {
-                    const selectedRadio = document.querySelector(`input[name="tip${i}"]:checked`);
-                    if (selectedRadio) {
-                        tips.push(selectedRadio.value);
-                    } else {
-                        alert(`Prosím vyberte tip pro ${i + 1}. zápas`);
-                        return;
-                    }
-                }
+                            tablesContainer.innerHTML = ''; // Clear previous tables
     
-                let currentRound;
-                try {
-                    const roundDocRef = doc(db, 'active', 'round');
-                    const roundDocSnap = await getDoc(roundDocRef);
+                            try {
+                                // Fetch password for the user
+                                const pswdDocRef = doc(db, 'passwords', username);
+                                const pswdDocSnap = await getDoc(pswdDocRef);
     
-                    if (roundDocSnap.exists()) {
-                        const roundData = roundDocSnap.data();
-                        currentRound = roundData.active;
-    
-                        if (!currentRound) {
-                            alert('Chyba číslo 100');
-                            return;
-                        }
-                    } else {
-                        alert('Chyba číslo 101');
-                        return;
-                    }
-                } catch (error) {
-                    console.error('Error getting current round: ', error);
-                    alert('Chyba číslo 102');
-                    return;
-                }
-    
-                try {
-                    const zapasyDocRef = doc(db, currentRound, 'zapasy');
-                    const zapasyDocSnap = await getDoc(zapasyDocRef);
-    
-                    if (zapasyDocSnap.exists()) {
-                        const data = zapasyDocSnap.data();
-                        const timestamp = data.time;
-    
-                        if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
-                            const currentTime = new Date();
-                            const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
-    
-                            if (currentTime > deadlineTime) {
-                                alert("❗Tipování je uzavřeno. Nelze odeslat tipy po uzávěrce❗");
-                                return;
-                            }
-                        } else {
-                            console.error("Timestamp field is not a valid Firestore Timestamp object.");
-                            alert("Error: Invalid timestamp in database.");
-                            return;
-                        }
-                    } else {
-                        console.log("No such document with ID 'zapasy'!");
-                        alert("Error: No match data found for today.");
-                        return;
-                    }
-                } catch (error) {
-                    console.error("Error getting document: ", error);
-                    alert("Error checking deadline.");
-                    return;
-                }
-    
-                const name = document.getElementById('name').value;
-                const enteredPassword = document.getElementById('pswd').value;
-    
-                let storedPassword;
-                let rememberPswd = "";
-                try {
-                    const pswdDocRef = doc(db, 'passwords', name);
-                    const pswdDocSnap = await getDoc(pswdDocRef);
-    
-                    if (pswdDocSnap.exists()) {
-                        const pswdData = pswdDocSnap.data();
-                        storedPassword = pswdData.pswd;
-    
-                        if (enteredPassword !== storedPassword) {
-                            alert("❌Nesprávné heslo.❌");
-                            return;
-                        }
-                    } else {
-                        try {
-                            await setDoc(pswdDocRef, {
-                                pswd: enteredPassword
-                            });
-                            console.log("New password record created for:", name);
-                            rememberPswd = "\n\n❗Zapamatujte si heslo❗\n\n🙋 Nick: "+name+"\n🔒 Heslo: "+enteredPassword;
-                        } catch (error) {
-                            console.error('Error creating new password record: ', error);
-                            alert('Chyba číslo 111: Chyba při vytváření nového hesla.');
-                            return;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error getting password: ', error);
-                    alert('Chyba číslo 110: Chyba při kontrole hesla.');
-                    return;
-                }
-    
-                try {
-                    const pointsDocRef = doc(db, 'points', name);
-                    const pointsDocSnap = await getDoc(pointsDocRef);
-    
-                    if (!pointsDocSnap.exists()) {
-                        await setDoc(pointsDocRef, {
-                            points: 0
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    alert("Chyba číslo 106");
-                    return;
-                }
-    
-                try {
-                    const userDocRef = doc(db, currentRound, name);
-    
-                    await setDoc(userDocRef, {
-                        tips: tips
-                    });
-                    console.log("Document written with ID: ", name);
-                    alert("Úspěšně odesláno ✅"+rememberPswd);
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    alert("Nepovedlo se odeslat\nChyba číslo 107");
-                }
-            });
-    
-            async function populateMatchData() {
-                const dynamicInputFieldsDiv = document.getElementById('dynamicInputFields');
-                dynamicInputFieldsDiv.innerHTML = '';
-    
-                try {
-                    const roundDocRef = doc(db, 'active', 'round');
-                    const roundDocSnap = await getDoc(roundDocRef);
-    
-                    if (roundDocSnap.exists()) {
-                        const roundData = roundDocSnap.data();
-                        const currentRound = roundData.active;
-    
-                        if (currentRound) {
-                            document.getElementById('roundText').innerText = currentRound;
-                            const zapasyDocRef = doc(db, currentRound, 'zapasy');
-                            const zapasyDocSnap = await getDoc(zapasyDocRef);
-    
-                            if (zapasyDocSnap.exists()) {
-                                const data = zapasyDocSnap.data();
-                                const tips = data.tips;
-                                const matches = data.matches;
-                                const points = data.points;
-                                const timestamp = data.time;
-                                const buttons = data.buttons;
-    
-                                if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
-                                    const currentTime = new Date();
-                                    const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
-                                    const deadlineElement = document.getElementById('deadline');
-    
-                                    if (currentTime > deadlineTime) {
-                                        deadlineElement.style.color = "red";
-                                        deadlineElement.textContent = "Je po uzávěrce";
-                                    } else {
-                                        deadlineElement.textContent = `Uzávěrka: ${formatTimestamp(timestamp)}`;
-                                    }
-                                } else {
-                                    console.error("Timestamp field is not a valid Firestore Timestamp object.");
-                                    alert("Error: Invalid timestamp in database.");
+                                if (!pswdDocSnap.exists()) {
+                                    alert('Tento nick neexistuje nebo ještě nemá heslo');
+                                    return;
                                 }
     
-                                if (tips && matches && tips.length === matches.length) {
-                                    for (let i = 0; i < tips.length; i++) {
-                                        const tipLabel = document.createElement('label');
-                                        tipLabel.textContent = `Zápas: ${matches[i]}`;
-                                        tipLabel.classList.add('dynamic-label');
+                                const storedPassword = pswdDocSnap.data().pswd;
+                                if (password !== storedPassword) {
+                                    alert('❌Špatné heslo❌');
+                                    return;
+                                }
     
-                                        const tipText = document.createElement('span');
-                                        tipText.textContent = `Tipovat: ${tips[i]}`;
-                                        tipText.classList.add('dynamic-text');
+                                // Function to generate collection names dynamically from "14.kolo" to "1.kolo"
+                                const collections = [];
+                                for (let i = 14; i >= 1; i--) {
+                                    collections.push(`${i}.kolo`);
+                                }
     
-                                        const pointsText = document.createElement('span');
-                                        pointsText.textContent = `Body: ${points[i]}`;
-                                        pointsText.classList.add('dynamic-points');
+                                // Loop through each collection name
+                                for (const collectionName of collections) {
+                                    const userDataRef = doc(db, collectionName, username);
+                                    const userDataSnapshot = await getDoc(userDataRef);
     
-                                        dynamicInputFieldsDiv.appendChild(tipLabel);
-                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                                        dynamicInputFieldsDiv.appendChild(tipText);
-                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                                        dynamicInputFieldsDiv.appendChild(pointsText);
-                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
+                                    if (!userDataSnapshot.exists()) {
+                                        // Skip if no data found for this collection
+                                        continue;
+                                    }
     
-                                        if (buttons && buttons[i]) {
-                                            const options = buttons[i].split(';');
-                                            const buttonContainer = document.createElement('div');
-                                            buttonContainer.classList.add('button-container');
+                                    const userData = userDataSnapshot.data();
     
-                                            options.forEach((option, index) => {
-                                                const radioInput = document.createElement('input');
-                                                const radioId = `tip${i}_${index}`;
-                                                radioInput.type = 'radio';
-                                                radioInput.name = `tip${i}`;
-                                                radioInput.value = option;
-                                                radioInput.id = radioId;
-                                                radioInput.classList.add('dynamic-radio-input');
+                                    // Get results data
+                                    const resultsRef = doc(db, collectionName, "results");
+                                    const resultsDataSnapshot = await getDoc(resultsRef);
     
-                                                const radioLabel = document.createElement('label');
-                                                radioLabel.textContent = option;
-                                                radioLabel.setAttribute('for', radioId);
-                                                radioLabel.classList.add('dynamic-radio-label');
+                                    let resultsData = null;
+                                    if (resultsDataSnapshot.exists()) {
+                                        resultsData = resultsDataSnapshot.data();
+                                    }
     
-                                                buttonContainer.appendChild(radioInput);
-                                                buttonContainer.appendChild(radioLabel);
-                                            });
+                                    // Get matches data
+                                    const matchesRef = doc(db, collectionName, "zapasy");
+                                    const matchesSnapshot = await getDoc(matchesRef);
     
-                                            dynamicInputFieldsDiv.appendChild(buttonContainer);
+                                    let matchesData = [];
+                                    let tipsData = [];
+                                    let pointsData = [];
+                                    if (matchesSnapshot.exists()) {
+                                        matchesData = matchesSnapshot.data().matches;
+                                        tipsData = matchesSnapshot.data().tips;
+                                        pointsData = matchesSnapshot.data().points;
+                                    }
+    
+                                    let userValues = userData[Object.keys(userData)[0]]; // Assuming the key is always the same
+    
+                                    // Ensure userValues is an array
+                                    if (typeof userValues === 'string') {
+                                        userValues = userValues.split(',').map(value => value.trim()); // Split comma-separated values and trim spaces
+                                    } else if (!Array.isArray(userValues)) {
+                                        userValues = [userValues]; // Ensure userValues is an array
+                                    }
+    
+                                    let resultValues = [];
+                                    if (resultsData) {
+                                        resultValues = resultsData[Object.keys(resultsData)[0]]; // Assuming the key is always the same
+    
+                                        // Ensure resultValues is an array
+                                        if (typeof resultValues === 'string') {
+                                            resultValues = resultValues.split(',').map(value => value.trim()); // Split comma-separated values and trim spaces
+                                        } else if (!Array.isArray(resultValues)) {
+                                            resultValues = [resultValues]; // Ensure resultValues is an array
                                         }
-    
-                                        dynamicInputFieldsDiv.appendChild(document.createElement('hr'));
                                     }
-                                } else {
-                                    console.log("Data for tips and matches do not match or are missing.");
-                                    alert("Error: Mismatch or missing data for tips and matches.");
+    
+                                    // Create the collection name div
+                                    const collectionNameDiv = document.createElement('div');
+                                    collectionNameDiv.className = 'collection-name';
+                                    collectionNameDiv.textContent = collectionName;
+                                    tablesContainer.appendChild(collectionNameDiv);
+    
+                                    // Create the table and apply styles
+                                    const table = document.createElement('table');
+                                    table.border = "1";
+                                    table.style.width = 'auto';
+                                    table.style.maxWidth = '100%';
+                                    table.style.borderCollapse = 'collapse';
+                                    table.style.margin = '20px auto';
+                                    table.style.borderRadius = '10px';
+                                    table.style.overflow = 'hidden';
+                                    table.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                                    table.style.tableLayout = 'auto';
+    
+                                    // Ensure both arrays have the same length for pairing
+                                    const maxLength = Math.max(matchesData.length, userValues.length);
+    
+                                    // Loop through matches and user values to create rows
+                                    for (let i = 0; i < maxLength; i++) {
+                                        // Row for "Zápasy"
+                                        const rowZápasy = document.createElement('tr');
+    
+                                        const matchCell = document.createElement('td');
+                                        matchCell.innerHTML = `${matchesData[i] || ''}<br><span style="color: #f59a00;">${tipsData[i] || ''}</span>`;
+                                        rowZápasy.appendChild(matchCell);
+                                        table.appendChild(rowZápasy);
+    
+                                        // Row for "Tipy"
+                                        const rowTipy = document.createElement('tr');
+    
+                                        const valueCell = document.createElement('td');
+                                        try {
+                                            const value = userValues[i] || ''; // Use empty string if no user value
+                                            const lowerCaseUserValue = value.toLowerCase();
+                                            const lowerCaseResultValue = resultsData && resultValues[i] ? resultValues[i].toLowerCase() : "";
+    
+                                            if (resultsData && lowerCaseUserValue === lowerCaseResultValue) {
+                                                valueCell.style.backgroundColor = 'lightgreen'; // Set background to light green if values match
+                                                valueCell.style.color = '#167be8';
+                                            } else if (resultsData) {
+                                                valueCell.style.backgroundColor = 'lightcoral'; // Set background to light red if values don't match
+                                                valueCell.style.color = '#167be8';
+                                            }
+    
+                                            valueCell.innerHTML = `<span style="font-weight: bold;">${value}</span> (${pointsData[i]} b)`;
+    
+                                        } catch (error) {
+                                            console.error("Error processing values:", error);
+                                        }
+                                        rowTipy.appendChild(valueCell);
+                                        table.appendChild(rowTipy);
+                                    }
+    
+                                    // Append the table to the tablesContainer
+                                    tablesContainer.appendChild(table);
                                 }
-                            } else {
-                                console.log("No such document!");
-                                alert("Error: No match data found for the current round.");
+    
+                                if (tablesContainer.children.length === 0) {
+                                    alert('No data found for user in the available collections.');
+                                }
+                            } catch (error) {
+                                alert('An error occurred: ' + error.message);
+                            } finally {
+                                // Hide spinner and enable button
+                                submitButton.disabled = false;
+                                submitButton.value = 'Načíst';
+                                spinner.style.display = 'none';
                             }
-                        } else {
-                            alert("Chyba číslo 103");
-                        }
-                    } else {
-                        alert("Chyba číslo 104");
-                    }
-                } catch (error) {
-                    console.error("Error getting document: ", error);
-                    alert("Chyba číslo 105");
-                }
-    
-                try {
-                    const pointsCollection = collection(db, "points");
-                    const pointsSnapshot = await getDocs(pointsCollection);
-                    let usersList = [];
-    
-                    pointsSnapshot.forEach(doc => {
-                        const username = doc.id;
-                        const points = doc.data().points || 0;
-                        usersList.push({ name: username, points: points });
+                        });
                     });
-    
-                    usersList.sort((a, b) => b.points - a.points);
-    
-                    const tableBody = document.getElementById("users-table-body");
-                    let previousPoints = null;
-                    let previousNumber = 1;
-    
-                    usersList.forEach((user, index) => {
-                        const row = document.createElement("tr");
-    
-                        let rowNumber;
-                        if (previousPoints !== null && user.points === previousPoints) {
-                            rowNumber = previousNumber;
-                        } else {
-                            rowNumber = previousNumber = index + 1;
-                            previousPoints = user.points;
-                        }
-    
-                        const rowNumberCell = document.createElement("td");
-                        rowNumberCell.textContent = `${rowNumber}.`;
-                        row.appendChild(rowNumberCell);
-    
-                        const nameCell = document.createElement("td");
-                        nameCell.textContent = user.name;
-                        row.appendChild(nameCell);
-    
-                        const pointsCell = document.createElement("td");
-                        pointsCell.style.textAlign = "center";
-                        pointsCell.textContent = user.points;
-                        row.appendChild(pointsCell);
-    
-                        tableBody.appendChild(row);
-                    });
-                } catch (error) {
-                    console.error("Error fetching points: ", error);
-                    alert("Chyba při načítání bodů.");
-                }
-            }
-    
-            document.addEventListener('DOMContentLoaded', async function() {
-                await initializeFirebase();
-    
-                // Popup functionality
-                const openPopupBtn = document.getElementById('openPopupBtn');
-                const popup = document.getElementById('popup');
-                const closeBtn = document.querySelector('.close-btn');
-    
-                openPopupBtn.addEventListener('click', function() {
-                    popup.style.display = 'block';
                 });
-    
-                closeBtn.addEventListener('click', function() {
-                    popup.style.display = 'none';
-                });
-    
-                window.addEventListener('click', function(event) {
-                    if (event.target === popup) {
-                        popup.style.display = 'none';
-                    }
-                });
-    
-                const openWhy = document.getElementById('whyBtn');
-                const why = document.getElementById('whyPop');
-                const closeWhy = document.querySelector('.close-why');
-    
-                openWhy.addEventListener('click', function() {
-                    why.style.display = 'block';
-                });
-    
-                closeWhy.addEventListener('click', function() {
-                    why.style.display = 'none';
-                });
-    
-                window.addEventListener('click', function(event) {
-                    if (event.target === why) {
-                        why.style.display = 'none';
-                    }
-                });
+            }).catch(error => {
+                console.error("Error loading Firebase config:", error);
+                alert('Chyba číslo 216, nelze načíst data');
             });
-        }
-    </script>    
+        });
+    </script>
+    
 </body>
 </html>
