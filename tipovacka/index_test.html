@@ -632,110 +632,30 @@
                             }
                         });
     
-                        // Function to populate match data from Firestore and create dynamic input fields
                         async function populateMatchData() {
                             const dynamicInputFieldsDiv = document.getElementById('dynamicInputFields');
                             dynamicInputFieldsDiv.innerHTML = '';
-    
+
                             try {
                                 // Fetch the current round from Firestore
                                 const roundDocRef = doc(db, 'active', 'round');
                                 const roundDocSnap = await getDoc(roundDocRef);
-    
+
                                 if (roundDocSnap.exists()) {
                                     const roundData = roundDocSnap.data();
                                     const currentRound = roundData.active; // Assuming 'active' holds the current round
-    
+                                    console.log("Current Round: ", currentRound);
+
                                     if (currentRound) {
                                         document.getElementById('roundText').innerText = currentRound;
                                         const zapasyDocRef = doc(db, currentRound, 'zapasy');
                                         const zapasyDocSnap = await getDoc(zapasyDocRef);
-    
+
                                         if (zapasyDocSnap.exists()) {
                                             const data = zapasyDocSnap.data();
-                                            const tips = data.tips;
-                                            const matches = data.matches;
-                                            const points = data.points;
-                                            const timestamp = data.time;
-                                            const buttons = data.buttons;
-    
-                                            // Check if 'timestamp' is a Firestore Timestamp object
-                                            if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
-                                                const currentTime = new Date();
-                                                const deadlineTime = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
-                                                const deadlineElement = document.getElementById('deadline');
-    
-                                                if (currentTime > deadlineTime) {
-                                                    deadlineElement.style.color = "red";
-                                                    deadlineElement.textContent = "Je po uzávěrce";
-                                                } else {
-                                                    deadlineElement.textContent = `Uzávěrka: ${formatTimestamp(timestamp)}`;
-                                                }
-                                            } else {
-                                                console.error("Timestamp field is not a valid Firestore Timestamp object.");
-                                                alert("Error: Invalid timestamp in database.");
-                                            }
-    
-                                            if (tips && matches && tips.length === matches.length) {
-                                                for (let i = 0; i < tips.length; i++) {
-                                                    // Create dynamic input fields
-                                                    const tipLabel = document.createElement('label');
-                                                    tipLabel.textContent = `Zápas: ${matches[i]}`;
-                                                    tipLabel.classList.add('dynamic-label');
-    
-                                                    // Create second line text node
-                                                    const tipText = document.createElement('span');
-                                                    tipText.textContent = `Tipovat: ${tips[i]}`;
-                                                    tipText.classList.add('dynamic-text');
-    
-                                                    const pointsText = document.createElement('span');
-                                                    pointsText.textContent = `Body: ${points[i]}`;
-                                                    pointsText.classList.add('dynamic-points');
-    
-                                                    // Append elements to dynamicInputFieldsDiv
-                                                    dynamicInputFieldsDiv.appendChild(tipLabel);
-                                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                                                    dynamicInputFieldsDiv.appendChild(tipText);
-                                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                                                    dynamicInputFieldsDiv.appendChild(pointsText);
-                                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-    
-                                                    // Create radio buttons
-                                                    if (buttons && buttons[i]) {
-                                                        const options = buttons[i].split(';');
-                                                        const buttonContainer = document.createElement('div');
-                                                        buttonContainer.classList.add('button-container');
-    
-                                                        options.forEach((option, index) => {
-                                                            const radioInput = document.createElement('input');
-                                                            const radioId = `tip${i}_${index}`;
-                                                            radioInput.type = 'radio';
-                                                            radioInput.name = `tip${i}`;
-                                                            radioInput.value = option;
-                                                            radioInput.id = radioId; // Assign an id to the radio button
-                                                            radioInput.classList.add('dynamic-radio-input');
-                                                            //radioInput.required = true;
-    
-                                                            const radioLabel = document.createElement('label');
-                                                            radioLabel.textContent = option;
-                                                            radioLabel.classList.add('dynamic-radio-label');
-                                                            radioLabel.setAttribute('for', radioId); // Set the for attribute to the radio button id
-    
-                                                            // Append the radio button and label to the container
-                                                            buttonContainer.appendChild(radioInput);
-                                                            buttonContainer.appendChild(radioLabel);
-                                                        });
-    
-                                                        // Append the button container to dynamicInputFieldsDiv
-                                                        dynamicInputFieldsDiv.appendChild(buttonContainer);
-                                                        dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                                                    }
-    
-                                                    dynamicInputFieldsDiv.appendChild(document.createElement('br'));
-                                                }
-                                            } else {
-                                                console.error("Tips and matches arrays are not of the same length.");
-                                            }
+                                            console.log("Match Data: ", data);
+
+                                            // Continue processing...
                                         } else {
                                             console.log(`No such document in collection '${currentRound}' with ID 'zapasy'!`);
                                         }
@@ -748,105 +668,104 @@
                             } catch (error) {
                                 console.error("Error getting document: ", error);
                             }
-    
+                        }
+
+                        async function loadPointsData() {
                             const pointsCollection = collection(db, "points");
                             const pointsSnapshot = await getDocs(pointsCollection);
                             let usersList = [];
-    
+
                             pointsSnapshot.forEach(doc => {
                                 const username = doc.id;
                                 const points = doc.data().points || 0;
-                                // console.log(`Username: ${username}, Points: ${points}`);
+                                console.log(`Username: ${username}, Points: ${points}`);
                                 usersList.push({ name: username, points: points });
                             });
-    
+
                             usersList.sort((a, b) => b.points - a.points);
-    
+
                             const tableBody = document.getElementById("users-table-body");
-                            let previousPoints = null; // Variable to keep track of the previous points
-                            let previousNumber = 1; // Variable to keep track of the previous row number
-    
+                            let previousPoints = null;
+                            let previousNumber = 1;
+
                             usersList.forEach((user, index) => {
                                 const row = document.createElement("tr");
-    
-                                // Determine the row number
+
                                 let rowNumber;
                                 if (previousPoints !== null && user.points === previousPoints) {
-                                    rowNumber = previousNumber; // Same number as the previous if points are equal
+                                    rowNumber = previousNumber;
                                 } else {
-                                    rowNumber = previousNumber = index + 1; // Update to the current index + 1
-                                    previousPoints = user.points; // Update previous points to current points
+                                    rowNumber = previousNumber = index + 1;
+                                    previousPoints = user.points;
                                 }
-    
-                                // Create and append the row number cell
+
                                 const rowNumberCell = document.createElement("td");
                                 rowNumberCell.textContent = `${rowNumber}.`;
                                 row.appendChild(rowNumberCell);
-    
-                                // Create and append the user name cell
+
                                 const nameCell = document.createElement("td");
                                 nameCell.textContent = user.name;
                                 row.appendChild(nameCell);
-    
-                                // Create and append the points cell
+
                                 const pointsCell = document.createElement("td");
                                 pointsCell.style.textAlign = "center";
                                 pointsCell.textContent = user.points;
                                 row.appendChild(pointsCell);
-    
-                                // Append the row to the table body
+
                                 tableBody.appendChild(row);
                             });
                         }
+
     
-                        // Call function to populate match data on page load
                         document.addEventListener('DOMContentLoaded', function() {
-                            populateMatchData(); // Existing function call
-    
-                            // Popup functionality
+                            populateMatchData(); // Ensure this is called after Firebase is initialized
+                            loadPointsData();    // Ensure this is called after Firebase is initialized
+
                             const openPopupBtn = document.getElementById('openPopupBtn');
                             const popup = document.getElementById('popup');
                             const closeBtn = document.querySelector('.close-btn');
-    
-                            // Open popup
-                            openPopupBtn.addEventListener('click', function() {
-                                popup.style.display = 'block';
-                            });
-    
-                            // Close popup when clicking on close button
-                            closeBtn.addEventListener('click', function() {
-                                popup.style.display = 'none';
-                            });
-    
-                            // Close popup when clicking outside the popup content
+
+                            if (openPopupBtn) {
+                                openPopupBtn.addEventListener('click', function() {
+                                    if (popup) popup.style.display = 'block';
+                                });
+                            }
+
+                            if (closeBtn) {
+                                closeBtn.addEventListener('click', function() {
+                                    if (popup) popup.style.display = 'none';
+                                });
+                            }
+
                             window.addEventListener('click', function(event) {
-                                if (event.target === popup) {
+                                if (popup && event.target === popup) {
                                     popup.style.display = 'none';
                                 }
                             });
-    
-                            // Popup functionality
+
                             const openWhy = document.getElementById('whyBtn');
                             const why = document.getElementById('whyPop');
                             const closeWhy = document.querySelector('.close-why');
-    
-                            // Open popup
-                            openWhy.addEventListener('click', function() {
-                                why.style.display = 'block';
-                            });
-    
-                            // Close popup when clicking on close button
-                            closeWhy.addEventListener('click', function() {
-                                why.style.display = 'none';
-                            });
-    
-                            // Close popup when clicking outside the popup content
+
+                            if (openWhy) {
+                                openWhy.addEventListener('click', function() {
+                                    if (why) why.style.display = 'block';
+                                });
+                            }
+
+                            if (closeWhy) {
+                                closeWhy.addEventListener('click', function() {
+                                    if (why) why.style.display = 'none';
+                                });
+                            }
+
                             window.addEventListener('click', function(event) {
-                                if (event.target === why) {
+                                if (why && event.target === why) {
                                     why.style.display = 'none';
                                 }
                             });
                         });
+
                     });
                 });
             });
