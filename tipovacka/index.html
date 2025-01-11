@@ -642,7 +642,7 @@
                     const currentRound = roundData.active; // Assuming 'active' holds the current round
 
                     if (currentRound) {
-                        document.getElementById('roundText').innerText = currentRound;
+                        document.getElementById('roundText').innerText = currentRound + " tipovačky";
                         const zapasyDocRef = doc(db, currentRound, 'zapasy');
                         const zapasyDocSnap = await getDoc(zapasyDocRef);
 
