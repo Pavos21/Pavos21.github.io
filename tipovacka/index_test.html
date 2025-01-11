@@ -5,6 +5,7 @@
     <title>Neoficiální Tipovačka</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt.js/2.4.3/bcrypt.min.js"></script> <!-- Include bcrypt.js -->
     <style>
         body {
             background-color: #167be8;
@@ -563,31 +564,36 @@
                             // Step 2: Get user input
                             const name = document.getElementById('name').value;
                             const enteredPassword = document.getElementById('pswd').value; // Password entered by the user
-    
+                
                             // Step 3: Fetch and verify the stored password from Firestore
-                            let storedPassword;
                             let rememberPswd = "";
                             try {
                                 const pswdDocRef = doc(db, 'passwords', name);
                                 const pswdDocSnap = await getDoc(pswdDocRef);
-    
+                
                                 if (pswdDocSnap.exists()) {
                                     // User exists, compare entered password with stored password
                                     const pswdData = pswdDocSnap.data();
-                                    storedPassword = pswdData.pswd;
-    
-                                    if (enteredPassword !== storedPassword) {
+                                    const storedPassword = pswdData.pswd;
+                
+                                    // Compare hashed password using bcrypt
+                                    const passwordMatch = await bcrypt.compare(enteredPassword, storedPassword);
+                                    if (!passwordMatch) {
                                         alert("❌Nesprávné heslo.❌"); // Incorrect password
                                         return;
+                                    } else {
+                                        alert("✅ Heslo je správné.✅"); // Correct password
                                     }
                                 } else {
                                     // User does not exist, create a new record with the provided password
                                     try {
+                                        // Hash the password before saving it to the database
+                                        const hashedPassword = await bcrypt.hash(enteredPassword, 10); // 10 is the salt rounds
                                         await setDoc(pswdDocRef, {
-                                            pswd: enteredPassword
+                                            pswd: hashedPassword
                                         });
                                         console.log("New password record created for:", name);
-                                        rememberPswd = "\n\n❗Zapamatujte si heslo❗\n\n🙋 Nick: "+name+"\n🔒 Heslo: "+enteredPassword;
+                                        rememberPswd = "\n\n❗Zapamatujte si heslo❗\n\n🙋 Nick: " + name + "\n🔒 Heslo: " + enteredPassword;
                                     } catch (error) {
                                         console.error('Error creating new password record: ', error);
                                         alert('Chyba číslo 111: Chyba při vytváření nového hesla.'); // Error creating new password
