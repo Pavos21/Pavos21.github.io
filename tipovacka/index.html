@@ -5,6 +5,7 @@
     <title>Neoficiální Tipovačka</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/2.0.2/sha.js"></script> <!-- Include bcrypt.js -->
     <style>
         body {
             background-color: #167be8;
@@ -448,16 +449,15 @@
     <script src="./firebaseConfig.js"></script>
     <script type="module">
 
-        // Function to prevent whitespace input
-        function preventWhitespace(event) {
-            if (event.key === ' ') {
-                event.preventDefault();
-            }
+        // Function to remove all spaces from input
+        function removeSpaces(event) {
+            const input = event.target;
+            input.value = input.value.replace(/\s+/g, ''); // Remove all spaces
         }
 
         // Attach the event listener to both input fields
-        document.getElementById('name').addEventListener('keydown', preventWhitespace);
-        document.getElementById('pswd').addEventListener('keydown', preventWhitespace);
+        document.getElementById('name').addEventListener('input', removeSpaces);
+        document.getElementById('pswd').addEventListener('input', removeSpaces);
 
         // Your existing Firebase and form submission code...
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -545,44 +545,48 @@
                 return;
             }
 
-            // Step 2: Get user input
             const name = document.getElementById('name').value;
-            const enteredPassword = document.getElementById('pswd').value; // Password entered by the user
+            const enteredPassword = document.getElementById('pswd').value;
 
-            // Step 3: Fetch and verify the stored password from Firestore
-            let storedPassword;
             let rememberPswd = "";
+
             try {
+                // Fetch and verify stored password from Firestore
                 const pswdDocRef = doc(db, 'passwords', name);
                 const pswdDocSnap = await getDoc(pswdDocRef);
 
                 if (pswdDocSnap.exists()) {
-                    // User exists, compare entered password with stored password
+                    // User exists: compare entered password hash with stored password hash
                     const pswdData = pswdDocSnap.data();
-                    storedPassword = pswdData.pswd;
+                    const storedPassword = pswdData.pswd;
 
-                    if (enteredPassword !== storedPassword) {
+                    // Hash the entered password
+                    const hashObj = new jsSHA("SHA-512", "TEXT", { numRounds: 1 });
+                    hashObj.update(enteredPassword);
+                    const enteredPasswordHash = hashObj.getHash("HEX");
+
+                    if (enteredPasswordHash !== storedPassword) {
                         alert("❌Nesprávné heslo.❌"); // Incorrect password
                         return;
                     }
                 } else {
-                    // User does not exist, create a new record with the provided password
+                    // User does not exist: create a new record with the hashed password
+                    const hashObj = new jsSHA("SHA-512", "TEXT", { numRounds: 1 });
+                    hashObj.update(enteredPassword);
+                    const hashedPassword = hashObj.getHash("HEX");
+
                     try {
-                        await setDoc(pswdDocRef, {
-                            pswd: enteredPassword
-                        });
+                        await setDoc(pswdDocRef, { pswd: hashedPassword });
                         console.log("New password record created for:", name);
                         rememberPswd = "\n\n❗Zapamatujte si heslo❗\n\n🙋 Nick: "+name+"\n🔒 Heslo: "+enteredPassword;
                     } catch (error) {
-                        console.error('Error creating new password record: ', error);
-                        alert('Chyba číslo 111: Chyba při vytváření nového hesla.'); // Error creating new password
-                        return;
+                        console.error('Error creating new password record:', error);
+                        alert('Chyba číslo 111: Chyba při vytváření nového hesla.');
                     }
                 }
             } catch (error) {
-                console.error('Error getting password: ', error);
-                alert('Chyba číslo 110: Chyba při kontrole hesla.'); // Error checking password
-                return;
+                console.error('Error getting password:', error);
+                alert('Chyba číslo 110: Chyba při kontrole hesla.');
             }
 
             // Step 5: Check if the user already exists in the "points" collection
