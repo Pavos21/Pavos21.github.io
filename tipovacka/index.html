@@ -445,6 +445,7 @@
         Stránka slouží pouze pro zábavu.</p>
     </div>
 
+    <script src="./firebaseConfig.js"></script>
     <script type="module">
 
         // Function to prevent whitespace input
@@ -462,16 +463,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
         import { getFirestore, doc, getDoc, updateDoc, arrayUnion, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAHVNMBCaAzfOLEAbAvMIeIDWWC3pOi8FU",
-            authDomain: "tipsport-tipovacka.firebaseapp.com",
-            projectId: "tipsport-tipovacka",
-            storageBucket: "tipsport-tipovacka.appspot.com",
-            messagingSenderId: "198960405925",
-            appId: "1:198960405925:web:b159a12d4177da420f5c4c",
-            measurementId: "G-WD5R3BFV3K"
-        };
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
